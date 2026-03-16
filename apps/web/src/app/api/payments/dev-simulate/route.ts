@@ -15,7 +15,11 @@ const schema = z.object({
 //
 // AbacatePay docs: POST /v1/pixQrCode/simulate-payment?id=<pixId>
 export async function POST(request: NextRequest) {
-  if (process.env.NODE_ENV === 'production') {
+  const devToolsEnabled =
+    process.env.NODE_ENV !== 'production' ||
+    process.env['NEXT_PUBLIC_ENABLE_DEV_TOOLS'] === 'true'
+
+  if (!devToolsEnabled) {
     return err('Not available in production', 403, 'FORBIDDEN')
   }
 
