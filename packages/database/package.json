@@ -1,0 +1,29 @@
+{
+  "name": "@loverecap/database",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./server": "./src/server.ts",
+    "./client": "./src/client.ts",
+    "./queries/projects": "./src/queries/projects.ts",
+    "./queries/memories": "./src/queries/memories.ts",
+    "./queries/assets": "./src/queries/assets.ts",
+    "./queries/payments": "./src/queries/payments.ts"
+  },
+  "scripts": {
+    "type-check": "tsc --noEmit",
+    "lint": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.0",
+    "@supabase/ssr": "^0.5.0",
+    "@loverecap/types": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.5.0"
+  }
+}
