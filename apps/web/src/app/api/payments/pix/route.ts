@@ -44,7 +44,10 @@ export async function POST(request: NextRequest) {
     const parsed = schema.safeParse(body)
     if (!parsed.success) return validationError(parsed.error)
 
-    const { project_id, email, tax_id, cellphone } = parsed.data
+    const { project_id, email } = parsed.data
+    // Strip non-digit characters — AbacatePay expects raw digits only
+    const tax_id = parsed.data.tax_id.replace(/\D/g, '')
+    const cellphone = parsed.data.cellphone.replace(/\D/g, '')
 
     // Verify project ownership via RLS-protected client
     const project = await getProjectById(supabase, project_id).catch(
