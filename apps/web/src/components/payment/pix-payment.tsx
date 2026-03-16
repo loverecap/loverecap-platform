@@ -10,6 +10,38 @@ import { createSupabaseBrowserClient } from '@/lib/supabase/client'
 
 type Step = 'form' | 'loading' | 'polling' | 'paid' | 'expired' | 'error'
 
+function maskCPF(value: string): string {
+  const d = value.replace(/\D/g, '').slice(0, 11)
+  if (d.length <= 3) return d
+  if (d.length <= 6) return `${d.slice(0, 3)}.${d.slice(3)}`
+  if (d.length <= 9) return `${d.slice(0, 3)}.${d.slice(3, 6)}.${d.slice(6)}`
+  return `${d.slice(0, 3)}.${d.slice(3, 6)}.${d.slice(6, 9)}-${d.slice(9)}`
+}
+
+function maskPhone(value: string): string {
+  const d = value.replace(/\D/g, '').slice(0, 11)
+  if (!d.length) return ''
+  if (d.length <= 2) return `(${d}`
+  if (d.length <= 6) return `(${d.slice(0, 2)}) ${d.slice(2)}`
+  if (d.length <= 10) return `(${d.slice(0, 2)}) ${d.slice(2, 6)}-${d.slice(6)}`
+  return `(${d.slice(0, 2)}) ${d.slice(2, 7)}-${d.slice(7)}`
+}
+
+function isValidCPF(cpf: string): boolean {
+  const d = cpf.replace(/\D/g, '')
+  if (d.length !== 11 || /^(\d)\1{10}$/.test(d)) return false
+  let sum = 0
+  for (let i = 0; i < 9; i++) sum += Number(d[i]) * (10 - i)
+  let r = (sum * 10) % 11
+  if (r >= 10) r = 0
+  if (r !== Number(d[9])) return false
+  sum = 0
+  for (let i = 0; i < 10; i++) sum += Number(d[i]) * (11 - i)
+  r = (sum * 10) % 11
+  if (r >= 10) r = 0
+  return r === Number(d[10])
+}
+
 const IS_DEV = process.env.NODE_ENV === 'development' || process.env['NEXT_PUBLIC_ENABLE_DEV_TOOLS'] === 'true'
 
 interface PixData {
@@ -194,10 +226,14 @@ export function PixPayment({ projectId, onSuccess }: PixPaymentProps) {
           <Input
             id="tax_id"
             placeholder="000.000.000-00"
+            inputMode="numeric"
             value={taxId}
-            onChange={(e) => setTaxId(e.target.value)}
+            onChange={(e) => setTaxId(maskCPF(e.target.value))}
             maxLength={14}
           />
+          {taxId.replace(/\D/g, '').length === 11 && !isValidCPF(taxId) && (
+            <p className="text-xs text-red-500">CPF inválido. Verifique os números.</p>
+          )}
         </div>
 
         <div className="space-y-2">
@@ -205,10 +241,14 @@ export function PixPayment({ projectId, onSuccess }: PixPaymentProps) {
           <Input
             id="cellphone"
             placeholder="(11) 99999-9999"
+            inputMode="numeric"
             value={cellphone}
-            onChange={(e) => setCellphone(e.target.value)}
-            maxLength={20}
+            onChange={(e) => setCellphone(maskPhone(e.target.value))}
+            maxLength={16}
           />
+          {cellphone.replace(/\D/g, '').length > 0 && cellphone.replace(/\D/g, '').length < 10 && (
+            <p className="text-xs text-red-500">Celular incompleto. Inclua DDD + número.</p>
+          )}
         </div>
 
         {errorMsg && (
@@ -224,7 +264,7 @@ export function PixPayment({ projectId, onSuccess }: PixPaymentProps) {
           onClick={handleCreatePix}
           disabled={
             !email.includes('@') ||
-            taxId.replace(/\D/g, '').length < 11 ||
+            !isValidCPF(taxId) ||
             cellphone.replace(/\D/g, '').length < 10
           }
         >

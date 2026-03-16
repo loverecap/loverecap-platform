@@ -149,7 +149,7 @@ export function PhotosForm() {
               )}
               <button
                 onClick={() => removePhoto(photo.assetId)}
-                className="absolute right-1.5 top-1.5 flex h-6 w-6 items-center justify-center rounded-full bg-black/50 text-white opacity-0 transition-opacity group-hover:opacity-100"
+                className="absolute right-1.5 top-1.5 flex h-6 w-6 items-center justify-center rounded-full bg-black/50 text-white opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity"
                 aria-label="Remover foto"
               >
                 <X className="h-3.5 w-3.5" />

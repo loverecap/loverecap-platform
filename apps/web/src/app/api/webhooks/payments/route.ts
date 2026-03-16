@@ -9,6 +9,7 @@ import {
   logEvent,
 } from '@loverecap/database'
 import { env } from '@/lib/env'
+import { createLogger } from '@/lib/logger'
 import { sendStoryReadyEmail, sendAccountSetupEmail } from '@/lib/email'
 
 // POST /api/webhooks/abacatepay
@@ -55,16 +56,18 @@ interface WebhookBody {
 }
 
 export async function POST(request: NextRequest) {
+  const log = createLogger('webhooks/payments', request)
+
   // ── Secret verification ───────────────────────────────────────────────
   const secret = env.abacatePayWebhookSecret()
   if (secret) {
     const authHeader = request.headers.get('authorization') ?? ''
     if (!verifySecret(secret, authHeader)) {
-      console.warn('[POST /api/webhooks/abacatepay] Invalid secret — rejected')
+      log.warn('Invalid webhook secret — request rejected')
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
   } else if (process.env.NODE_ENV === 'production') {
-    console.error('[POST /api/webhooks/abacatepay] ABACATEPAY_WEBHOOK_SECRET not configured in production!')
+    log.error('ABACATEPAY_WEBHOOK_SECRET not configured in production')
     return NextResponse.json({ error: 'Webhook secret not configured' }, { status: 500 })
   }
 
@@ -72,8 +75,11 @@ export async function POST(request: NextRequest) {
   try {
     body = await request.json() as WebhookBody
   } catch {
+    log.warn('Invalid JSON body')
     return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 })
   }
+
+  log.info('Webhook received', { event: body.event, billingId: body.billing?.id })
 
   const admin = createAdminClient()
 
@@ -84,26 +90,26 @@ export async function POST(request: NextRequest) {
   try {
     switch (body.event) {
       case 'billing.paid':
-        await handleBillingPaid(admin, body.billing)
+        await handleBillingPaid(admin, body.billing, log)
         break
 
       case 'billing.disputed':
-        await handleBillingDisputed(admin, body.billing)
+        await handleBillingDisputed(admin, body.billing, log)
         break
 
       case 'withdraw.done':
       case 'withdraw.failed':
-        // No action needed — just logged above for observability
+        log.info('Withdraw event — no action needed', { event: body.event })
         break
 
       default:
-        // Unknown event — acknowledge and move on
+        log.warn('Unknown webhook event', { event: body.event })
         break
     }
 
     return NextResponse.json({ received: true })
   } catch (error) {
-    console.error('[POST /api/webhooks/abacatepay]', error)
+    log.error('Unhandled webhook error', { error: String(error) })
     // Return 500 so AbacatePay retries the delivery
     return NextResponse.json({ error: 'Internal error' }, { status: 500 })
   }
@@ -112,30 +118,36 @@ export async function POST(request: NextRequest) {
 async function handleBillingPaid(
   admin: ReturnType<typeof createAdminClient>,
   billing: BillingPayload | undefined,
+  log: ReturnType<typeof createLogger>,
 ) {
   if (!billing?.id) return
 
   const payment = await getPaymentByProviderId(admin, billing.id).catch(() => null)
   if (!payment) {
-    console.warn('[webhook/abacatepay] billing.paid — no payment found for', billing.id)
+    log.warn('billing.paid — no payment record found', { billingId: billing.id })
     return
   }
 
-  if (payment.status === 'approved') return // idempotent
+  if (payment.status === 'approved') {
+    log.info('billing.paid — already approved, skipping (idempotent)', { paymentId: payment.id })
+    return
+  }
 
   await updatePaymentStatus(admin, payment.id, 'approved', billing.id)
+  log.info('Payment approved', { paymentId: payment.id, projectId: payment.project_id })
 
   const project = await getProjectById(admin, payment.project_id).catch(() => null)
   if (project) {
     try {
       await publishProject(admin, project.id, payment.user_id, project.slug)
+      log.info('Project published', { projectId: project.id, slug: project.slug })
 
       // Send email (fire-and-forget — never fail the webhook)
       void sendPostPaymentEmail(admin, payment, project).catch(
-        (emailErr) => console.error('[webhook/abacatepay] email failed', emailErr),
+        (emailErr) => log.error('Email dispatch failed', { error: String(emailErr) }),
       )
     } catch (publishError) {
-      console.error('[webhook/abacatepay] auto-publish failed', publishError)
+      log.error('Auto-publish failed', { projectId: project.id, error: String(publishError) })
     }
   }
 
@@ -193,16 +205,21 @@ async function sendPostPaymentEmail(
 async function handleBillingDisputed(
   admin: ReturnType<typeof createAdminClient>,
   billing: BillingPayload | undefined,
+  log: ReturnType<typeof createLogger>,
 ) {
   if (!billing?.id) return
 
   const payment = await getPaymentByProviderId(admin, billing.id).catch(() => null)
-  if (!payment) return
+  if (!payment) {
+    log.warn('billing.disputed — no payment record found', { billingId: billing.id })
+    return
+  }
 
   // Only revert if not already in a terminal state
   if (payment.status !== 'approved' && payment.status !== 'cancelled') return
 
   await updatePaymentStatus(admin, payment.id, 'rejected', billing.id)
+  log.warn('Payment disputed and rejected', { paymentId: payment.id, projectId: payment.project_id })
 
   await logEvent(admin, 'payment.pix.disputed', {
     projectId: payment.project_id,

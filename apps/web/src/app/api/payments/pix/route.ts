@@ -6,6 +6,7 @@ import { createPayment, getProjectById, createAdminClient, logEvent } from '@lov
 import { createPixCharge } from '@/lib/payments/abacatepay'
 import { env } from '@/lib/env'
 import { rateLimit } from '@/lib/rate-limit'
+import { createLogger } from '@/lib/logger'
 import {
   ok,
   err,
@@ -29,6 +30,8 @@ const schema = z.object({
 const PRICE_CENTS = 999
 
 export async function POST(request: NextRequest) {
+  const log = createLogger('payments/pix', request)
+
   const supabase = await createRouteHandlerClient()
   const user = await requireUser(supabase).catch(() => null)
   if (!user) return unauthorizedError()
@@ -36,6 +39,7 @@ export async function POST(request: NextRequest) {
   // 5 payment attempts per user per hour — prevents abuse of external API quota
   const rl = rateLimit(`pix:${user.id}`, 5, 60 * 60 * 1000)
   if (!rl.success) {
+    log.warn('Rate limit exceeded', { userId: user.id })
     return err('Muitas tentativas de pagamento. Tente novamente em breve.', 429, 'RATE_LIMITED')
   }
 
@@ -49,6 +53,8 @@ export async function POST(request: NextRequest) {
     const tax_id = parsed.data.tax_id.replace(/\D/g, '')
     const cellphone = parsed.data.cellphone.replace(/\D/g, '')
 
+    log.info('PIX charge requested', { userId: user.id, projectId: project_id })
+
     // Verify project ownership via RLS-protected client
     const project = await getProjectById(supabase, project_id).catch(
       (e: { code?: string }) => {
@@ -60,6 +66,7 @@ export async function POST(request: NextRequest) {
     if (!project) return notFoundError('Project')
     if (project.user_id !== user.id) return forbiddenError()
     if (project.status !== 'draft') {
+      log.warn('Invalid project status for payment', { projectId: project_id, status: project.status })
       return err(
         `Não é possível iniciar pagamento para um projeto com status "${project.status}"`,
         422,
@@ -82,6 +89,8 @@ export async function POST(request: NextRequest) {
         user_id: user.id,
       },
     })
+
+    log.info('PIX charge created', { chargeId: charge.id, projectId: project_id })
 
     // Use admin client — payments table has no INSERT RLS policy (anonymous users have role 'anon').
     // Ownership is already verified above via the RLS-protected project query.
@@ -113,7 +122,7 @@ export async function POST(request: NextRequest) {
       expiresAt: charge.expiresAt,
     })
   } catch (error) {
-    console.error('[POST /api/payments/pix]', error)
+    log.error('Unhandled error', { error: String(error) })
     return serverError()
   }
 }

@@ -11,6 +11,7 @@ import {
 import { checkPixStatus } from '@/lib/payments/abacatepay'
 import { env } from '@/lib/env'
 import { ok, err, unauthorizedError, notFoundError, serverError } from '@/lib/api-response'
+import { createLogger } from '@/lib/logger'
 import { sendStoryReadyEmail, sendAccountSetupEmail } from '@/lib/email'
 
 // GET /api/payments/status?payment_id=<uuid>
@@ -18,6 +19,8 @@ import { sendStoryReadyEmail, sendAccountSetupEmail } from '@/lib/email'
 // On PAID: marks payment approved + publishes the project automatically.
 // Returns: { status: 'PENDING' | 'PAID' | 'EXPIRED', slug?: string }
 export async function GET(request: NextRequest) {
+  const log = createLogger('payments/status', request)
+
   const supabase = await createRouteHandlerClient()
   const user = await requireUser(supabase).catch(() => null)
   if (!user) return unauthorizedError()
@@ -53,6 +56,7 @@ export async function GET(request: NextRequest) {
 
       // Mark payment as approved
       await updatePaymentStatus(admin, payment.id, 'approved', payment.provider_payment_id)
+      log.info('Payment confirmed via polling', { paymentId: payment.id, projectId: payment.project_id })
 
       // Fetch project to get slug and publish it
       const project = await getProjectById(admin, payment.project_id).catch(() => null)
@@ -60,17 +64,18 @@ export async function GET(request: NextRequest) {
 
       try {
         await publishProject(admin, payment.project_id, payment.user_id, slug)
+        log.info('Project auto-published', { projectId: payment.project_id, slug })
 
         // Send email (fire-and-forget)
         if (project) {
           void sendPostPaymentEmail(admin, user, payment, project, slug).catch(
-            (emailErr) => console.error('[status] email failed', emailErr),
+            (emailErr) => log.error('Email dispatch failed', { error: String(emailErr) }),
           )
         }
       } catch (publishError) {
         // Payment confirmed even if auto-publish fails (e.g. no memories added).
         // Project is now in "paid" status and can be published manually.
-        console.error('[status] auto-publish failed after PIX confirmation', publishError)
+        log.error('Auto-publish failed after PIX confirmation', { projectId: payment.project_id, error: String(publishError) })
       }
 
       void logEvent(admin, 'payment.pix.confirmed', {
@@ -84,12 +89,13 @@ export async function GET(request: NextRequest) {
 
     if (pixStatus === 'EXPIRED' || pixStatus === 'CANCELLED') {
       await updatePaymentStatus(supabase, payment.id, 'cancelled')
+      log.info('Payment expired/cancelled', { paymentId: payment.id, pixStatus })
       return ok({ status: 'EXPIRED' })
     }
 
     return ok({ status: 'PENDING' })
   } catch (error) {
-    console.error('[GET /api/payments/status]', error)
+    log.error('Unhandled error', { error: String(error) })
     return serverError()
   }
 }
@@ -113,7 +119,7 @@ async function sendPostPaymentEmail(
     if (!customerEmail) return
 
     await admin.auth.admin.updateUserById(payment.user_id, { email: customerEmail }).catch(
-      (e) => console.error('[status] updateUserById failed', e),
+      (e) => console.error(JSON.stringify({ level: 'error', service: 'payments/status', msg: 'updateUserById failed', error: String(e) })),
     )
 
     const appUrl = process.env['NEXT_PUBLIC_APP_URL'] ?? ''
