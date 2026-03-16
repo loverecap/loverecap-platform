@@ -86,7 +86,7 @@ export function StoryFutureMessage({ message, revealAt, hintText }: StoryFutureM
     <motion.section
       initial={reduce ? {} : { opacity: 0, y: 32 }}
       whileInView={reduce ? {} : { opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-48px' }}
+      viewport={{ once: true, amount: 0.05 }}
       transition={{ duration: 0.65, ease: 'easeOut' }}
       className="relative px-5 py-24 overflow-hidden"
       style={{ background: 'linear-gradient(180deg, #FFF8F2 0%, #F5E9E2 40%, #FFF0F3 70%, #FFF8F2 100%)' }}

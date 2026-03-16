@@ -9,8 +9,8 @@ import { motion, useReducedMotion } from 'framer-motion'
  *   - transform/opacity only (no width/height) → no CLS
  *   - ease-out enter: custom [0.22, 1, 0.36, 1] — natural deceleration
  *   - 600ms duration for section-level reveals (cinematic, not jarring)
- *   - margin "-80px": triggers before the section edge fully enters so the
- *     animation *completes* as the section comes into view, not after
+ *   - amount 0.05: fires when 5% of the element enters the viewport — avoids
+ *     iOS Safari bug where negative rootMargin prevents IntersectionObserver
  *   - once: true — sections never re-animate on scroll back
  *   - prefers-reduced-motion: skips all transforms, content is instant
  *   - opacity never lingers below 0.2 (fades fully in one shot)

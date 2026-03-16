@@ -119,7 +119,7 @@ export function StoryMoonPhase({ startDate }: StoryMoonPhaseProps) {
         <motion.div
           initial={reduce ? {} : { opacity: 0, y: 20 }}
           whileInView={reduce ? {} : { opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-60px' }}
+          viewport={{ once: true, amount: 0.05 }}
           transition={{ duration: 0.6, ease: 'easeOut' }}
           className="text-center mb-10"
         >
@@ -145,7 +145,7 @@ export function StoryMoonPhase({ startDate }: StoryMoonPhaseProps) {
         <motion.div
           initial={reduce ? {} : { opacity: 0, scale: 0.8 }}
           whileInView={reduce ? {} : { opacity: 1, scale: 1 }}
-          viewport={{ once: true, margin: '-40px' }}
+          viewport={{ once: true, amount: 0.05 }}
           transition={{ type: 'spring', stiffness: 120, damping: 14, delay: 0.1 }}
           className="mx-auto mb-8"
           style={{ maxWidth: 200 }}
@@ -163,7 +163,7 @@ export function StoryMoonPhase({ startDate }: StoryMoonPhaseProps) {
         <motion.div
           initial={reduce ? {} : { opacity: 0, y: 24 }}
           whileInView={reduce ? {} : { opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-40px' }}
+          viewport={{ once: true, amount: 0.05 }}
           transition={{ duration: 0.6, ease: 'easeOut', delay: 0.2 }}
           className="rounded-3xl px-6 py-6 text-center"
           style={{

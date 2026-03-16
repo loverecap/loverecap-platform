@@ -124,7 +124,7 @@ export function StoryGallery({ assets }: StoryGalleryProps) {
                   key={photo.id}
                   initial={reduce ? {} : { opacity: 0, x: 32 }}
                   whileInView={reduce ? {} : { opacity: 1, x: 0 }}
-                  viewport={{ once: true, margin: '-20px' }}
+                  viewport={{ once: true, amount: 0.05 }}
                   transition={{ duration: 0.5, delay: Math.min(i * 0.07, 0.28), ease: 'easeOut' }}
                   className="shrink-0 cursor-pointer"
                   style={{ width: '78%', scrollSnapAlign: 'center' }}

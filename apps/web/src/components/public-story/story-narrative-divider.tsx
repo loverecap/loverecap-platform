@@ -21,7 +21,7 @@ export function StoryNarrativeDivider({ text, variant = 'default' }: StoryNarrat
     <motion.div
       initial={reduce ? {} : { opacity: 0, y: 24 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-80px' }}
+      viewport={{ once: true, amount: 0.05 }}
       transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
       className="px-8 py-10 text-center"
       aria-hidden="true"

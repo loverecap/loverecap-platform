@@ -33,7 +33,7 @@ function StatCard({ icon, value, label, delay, accent }: StatCardProps) {
     <motion.div
       initial={reduce ? {} : { opacity: 0, y: 28, scale: 0.94 }}
       whileInView={{ opacity: 1, y: 0, scale: 1 }}
-      viewport={{ once: true, margin: '-32px' }}
+      viewport={{ once: true, amount: 0.05 }}
       transition={{ duration: 0.55, delay, ease: [0.22, 1, 0.36, 1] }}
       className="relative overflow-hidden rounded-2xl p-5 text-center flex flex-col items-center gap-2"
       style={{

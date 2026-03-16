@@ -217,7 +217,7 @@ export function StoryExperience({
             <motion.section
               initial={reduce ? {} : { opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-80px' }}
+              viewport={{ once: true, amount: 0.05 }}
               transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
               className="relative overflow-hidden px-6 py-24 text-center"
               style={{

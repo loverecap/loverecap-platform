@@ -122,7 +122,7 @@ function YouTubeMusicPlayer({
       <motion.div
         initial={reduce ? {} : { opacity: 0, y: 28 }}
         whileInView={reduce ? {} : { opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: '-48px' }}
+        viewport={{ once: true, amount: 0.05 }}
         transition={{ duration: 0.6, ease: 'easeOut' }}
         className="mx-auto max-w-sm w-full"
       >
@@ -287,7 +287,7 @@ function LegacyAudioPlayer({
     <motion.div
       initial={reduce ? {} : { opacity: 0, y: 28 }}
       whileInView={reduce ? {} : { opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-48px' }}
+      viewport={{ once: true, amount: 0.05 }}
       transition={{ duration: 0.6, ease: 'easeOut' }}
       className="mx-auto max-w-sm w-full"
     >
