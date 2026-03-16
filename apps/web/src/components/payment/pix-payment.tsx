@@ -10,7 +10,7 @@ import { createSupabaseBrowserClient } from '@/lib/supabase/client'
 
 type Step = 'form' | 'loading' | 'polling' | 'paid' | 'expired' | 'error'
 
-const IS_DEV = process.env.NODE_ENV === 'development'
+const IS_DEV = process.env.NODE_ENV === 'development' || process.env['NEXT_PUBLIC_ENABLE_DEV_TOOLS'] === 'true'
 
 interface PixData {
   paymentId: string
