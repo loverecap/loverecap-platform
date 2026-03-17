@@ -10,12 +10,21 @@ import { createSupabaseBrowserClient } from '@/lib/supabase/client'
 
 type Step = 'form' | 'loading' | 'polling' | 'paid' | 'expired' | 'error'
 
-function maskCPF(value: string): string {
-  const d = value.replace(/\D/g, '').slice(0, 11)
-  if (d.length <= 3) return d
-  if (d.length <= 6) return `${d.slice(0, 3)}.${d.slice(3)}`
-  if (d.length <= 9) return `${d.slice(0, 3)}.${d.slice(3, 6)}.${d.slice(6)}`
-  return `${d.slice(0, 3)}.${d.slice(3, 6)}.${d.slice(6, 9)}-${d.slice(9)}`
+/** CPF mask: 000.000.000-00 | CNPJ mask: 00.000.000/0000-00 */
+function maskTaxId(value: string): string {
+  const d = value.replace(/\D/g, '').slice(0, 14)
+  if (d.length <= 11) {
+    if (d.length <= 3) return d
+    if (d.length <= 6) return `${d.slice(0, 3)}.${d.slice(3)}`
+    if (d.length <= 9) return `${d.slice(0, 3)}.${d.slice(3, 6)}.${d.slice(6)}`
+    return `${d.slice(0, 3)}.${d.slice(3, 6)}.${d.slice(6, 9)}-${d.slice(9)}`
+  }
+  // CNPJ
+  if (d.length <= 2) return d
+  if (d.length <= 5) return `${d.slice(0, 2)}.${d.slice(2)}`
+  if (d.length <= 8) return `${d.slice(0, 2)}.${d.slice(2, 5)}.${d.slice(5)}`
+  if (d.length <= 12) return `${d.slice(0, 2)}.${d.slice(2, 5)}.${d.slice(5, 8)}/${d.slice(8)}`
+  return `${d.slice(0, 2)}.${d.slice(2, 5)}.${d.slice(5, 8)}/${d.slice(8, 12)}-${d.slice(12)}`
 }
 
 function maskPhone(value: string): string {
@@ -40,6 +49,37 @@ function isValidCPF(cpf: string): boolean {
   r = (sum * 10) % 11
   if (r >= 10) r = 0
   return r === Number(d[10])
+}
+
+function isValidCNPJ(cnpj: string): boolean {
+  const d = cnpj.replace(/\D/g, '')
+  if (d.length !== 14 || /^(\d)\1{13}$/.test(d)) return false
+  const calc = (s: string, w: number[]) => {
+    const sum = s.split('').reduce((acc, n, i) => acc + Number(n) * w[i]!, 0)
+    const r = sum % 11
+    return r < 2 ? 0 : 11 - r
+  }
+  return (
+    calc(d.slice(0, 12), [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]) === Number(d[12]) &&
+    calc(d.slice(0, 13), [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]) === Number(d[13])
+  )
+}
+
+function isValidTaxId(value: string): boolean {
+  const d = value.replace(/\D/g, '')
+  if (d.length === 11) return isValidCPF(value)
+  if (d.length === 14) return isValidCNPJ(value)
+  return false
+}
+
+function taxIdErrorMsg(value: string): string | null {
+  const d = value.replace(/\D/g, '')
+  if (d.length === 0) return null
+  if (d.length === 11 && !isValidCPF(value)) return 'CPF inválido. Verifique os números.'
+  if (d.length === 14 && !isValidCNPJ(value)) return 'CNPJ inválido. Verifique os números.'
+  if (d.length > 0 && d.length < 11) return 'Informe um CPF (11 dígitos) ou CNPJ (14 dígitos).'
+  if (d.length > 11 && d.length < 14) return 'CNPJ incompleto (14 dígitos).'
+  return null
 }
 
 const IS_DEV = process.env.NODE_ENV === 'development' || process.env['NEXT_PUBLIC_ENABLE_DEV_TOOLS'] === 'true'
@@ -222,17 +262,17 @@ export function PixPayment({ projectId, onSuccess }: PixPaymentProps) {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="tax_id">CPF</Label>
+          <Label htmlFor="tax_id">CPF ou CNPJ</Label>
           <Input
             id="tax_id"
-            placeholder="000.000.000-00"
+            placeholder="000.000.000-00 ou 00.000.000/0000-00"
             inputMode="numeric"
             value={taxId}
-            onChange={(e) => setTaxId(maskCPF(e.target.value))}
-            maxLength={14}
+            onChange={(e) => setTaxId(maskTaxId(e.target.value))}
+            maxLength={18}
           />
-          {taxId.replace(/\D/g, '').length === 11 && !isValidCPF(taxId) && (
-            <p className="text-xs text-red-500">CPF inválido. Verifique os números.</p>
+          {taxIdErrorMsg(taxId) && (
+            <p className="text-xs text-red-500">{taxIdErrorMsg(taxId)}</p>
           )}
         </div>
 
@@ -264,7 +304,7 @@ export function PixPayment({ projectId, onSuccess }: PixPaymentProps) {
           onClick={handleCreatePix}
           disabled={
             !email.includes('@') ||
-            !isValidCPF(taxId) ||
+            !isValidTaxId(taxId) ||
             cellphone.replace(/\D/g, '').length < 10
           }
         >

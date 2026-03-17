@@ -171,6 +171,7 @@ export function TimelineForm() {
   }
 
   const shortDescriptionValue = form.watch('short_description') ?? ''
+  const titleValue = form.watch('title') ?? ''
   const selectedEmoji = form.watch('emoji')
 
   return (
@@ -238,30 +239,41 @@ export function TimelineForm() {
                     <FormLabel>
                       Ícone do momento <span className="text-[#FF4D6D]">*</span>
                     </FormLabel>
-                    <div className="flex flex-wrap gap-2 mt-1">
+                    <div
+                      className={cn(
+                        'flex flex-wrap gap-2 mt-1 rounded-xl p-3 border transition-colors',
+                        fieldState.error
+                          ? 'border-red-300 bg-red-50/50'
+                          : 'border-transparent bg-neutral-50',
+                      )}
+                    >
                       {EMOJI_SUGGESTIONS.map((e) => (
                         <button
                           key={e}
                           type="button"
                           onClick={() => field.onChange(e)}
                           className={cn(
-                            'flex h-10 w-10 items-center justify-center rounded-xl border text-xl transition-all',
+                            'flex h-11 w-11 items-center justify-center rounded-xl border text-xl transition-all',
                             field.value === e
-                              ? 'border-[#FF4D6D] bg-[#FFF0F3] scale-110 shadow-sm'
+                              ? 'border-[#FF4D6D] bg-[#FFF0F3] scale-110 shadow-md ring-2 ring-[#FF4D6D]/20'
                               : fieldState.error
-                                ? 'border-red-200 bg-white hover:border-[#FF4D6D] hover:bg-[#FFF0F3]/50'
-                                : 'border-neutral-200 bg-white hover:border-neutral-300 hover:bg-neutral-50',
+                                ? 'border-red-200 bg-white hover:border-[#FF4D6D] hover:bg-[#FFF0F3]/60 hover:scale-105'
+                                : 'border-neutral-200 bg-white hover:border-[#FF4D6D]/50 hover:bg-[#FFF0F3]/40 hover:scale-105',
                           )}
                           aria-label={e}
+                          title={e}
                         >
                           {e}
                         </button>
                       ))}
                     </div>
-                    <p className="text-[11px] text-neutral-400 mt-1">
-                      Aparece no cartão da memória na linha do tempo
-                    </p>
-                    <FormMessage />
+                    {fieldState.error ? (
+                      <FormMessage />
+                    ) : (
+                      <p className="text-[11px] text-neutral-400 mt-1">
+                        Escolha um emoji que representa este momento
+                      </p>
+                    )}
                   </FormItem>
                 )}
               />
@@ -294,8 +306,9 @@ export function TimelineForm() {
                     >
                       <X className="h-4 w-4" />
                     </button>
-                    <div className="absolute bottom-2 left-2 rounded-md bg-black/40 px-2 py-0.5 text-[11px] text-white/80">
-                      {pendingPhoto.file.name}
+                    <div className="absolute bottom-2 left-2 flex items-center gap-1.5 rounded-md bg-black/50 px-2 py-1">
+                      <ImagePlus className="h-3 w-3 text-white/70" />
+                      <span className="text-[11px] text-white/80 max-w-40 truncate">{pendingPhoto.file.name}</span>
                     </div>
                   </div>
                 ) : (
@@ -306,20 +319,25 @@ export function TimelineForm() {
                     onDragLeave={() => setIsDragging(false)}
                     onDrop={handleDrop}
                     className={cn(
-                      'flex w-full flex-col items-center gap-2 rounded-xl border-2 border-dashed bg-white px-4 py-6 text-center transition-all',
+                      'flex w-full flex-col items-center gap-3 rounded-xl border-2 border-dashed bg-white px-4 py-7 text-center transition-all cursor-pointer',
                       isDragging
                         ? 'border-[#FF4D6D] bg-[#FFF0F3]/40 scale-[1.01]'
                         : 'border-neutral-200 hover:border-[#FF4D6D] hover:bg-[#FFF0F3]/20',
                     )}
                   >
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#FFF0F3]">
-                      <ImagePlus className="h-5 w-5 text-[#FF4D6D]" />
+                    <div className={cn(
+                      'flex h-12 w-12 items-center justify-center rounded-xl transition-colors',
+                      isDragging ? 'bg-[#FF4D6D]/15' : 'bg-[#FFF0F3]',
+                    )}>
+                      <ImagePlus className="h-6 w-6 text-[#FF4D6D]" />
                     </div>
                     <div>
                       <p className="text-sm font-medium text-neutral-700">
-                        {isDragging ? 'Solte a foto aqui' : 'Clique ou arraste uma foto'}
+                        {isDragging ? 'Solte a foto aqui ✨' : 'Adicionar uma foto'}
                       </p>
-                      <p className="text-xs text-neutral-400 mt-0.5">JPG, PNG, WebP · máx. 10MB</p>
+                      <p className="text-xs text-neutral-400 mt-1">
+                        Toque para selecionar · JPG, PNG, WebP · máx. 10MB
+                      </p>
                     </div>
                   </button>
                 )}
@@ -332,13 +350,23 @@ export function TimelineForm() {
                   name="title"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>
-                        Título da memória <span className="text-[#FF4D6D]">*</span>
-                      </FormLabel>
+                      <div className="flex items-center justify-between">
+                        <FormLabel>
+                          Título da memória <span className="text-[#FF4D6D]">*</span>
+                        </FormLabel>
+                        <span className={cn(
+                          'text-xs tabular-nums',
+                          titleValue.length > 100 ? 'text-amber-500' : 'text-neutral-400',
+                          titleValue.length >= 120 ? 'text-red-500' : '',
+                        )}>
+                          {titleValue.length}/120
+                        </span>
+                      </div>
                       <FormControl>
                         <Input
                           placeholder="Ex: Primeira viagem juntos"
                           autoCapitalize="words"
+                          maxLength={120}
                           {...field}
                           onChange={(e) => field.onChange(toTitleCase(e.target.value))}
                         />
@@ -448,12 +476,6 @@ export function TimelineForm() {
                 )}
               </div>
 
-              {/* Preview do ícone selecionado */}
-              {selectedEmoji && (
-                <p className="text-xs text-neutral-400">
-                  Ícone selecionado: <span className="text-base">{selectedEmoji}</span>
-                </p>
-              )}
             </form>
           </Form>
         </div>
