@@ -1,6 +1,5 @@
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
-import { createRouteHandlerClient } from '@/lib/supabase/server'
 import { getProjectBySlug, createAdminClient } from '@loverecap/database'
 import { StoryExperience } from '@/components/public-story/story-experience'
 
@@ -53,9 +52,8 @@ type RawFutureMessage = {
 
 export async function generateMetadata({ params }: StoryPageProps): Promise<Metadata> {
   const { slug } = await params
-  const supabase = await createRouteHandlerClient()
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const project = await getProjectBySlug(supabase, slug).catch(() => null) as any
+  const project = await getProjectBySlug(createAdminClient(), slug).catch(() => null) as any
 
   if (!project) return { title: 'História não encontrada | LoveRecap' }
 
@@ -71,10 +69,17 @@ export async function generateMetadata({ params }: StoryPageProps): Promise<Meta
 
 export default async function StoryPage({ params }: StoryPageProps) {
   const { slug } = await params
-  const supabase = await createRouteHandlerClient()
+
+  // Use the admin client (service role) for all data fetching on the public story page.
+  // The `assets` table has an RLS policy that restricts reads to the project owner.
+  // Unauthenticated visitors have no session → auth.uid() = null → RLS returns an
+  // empty assets array → StoryGallery receives photos.length === 0 → section disappears.
+  // The admin client bypasses RLS so any visitor sees the full story. This is safe
+  // because only published projects are accessible here (slug is only created after payment).
+  const admin = createAdminClient()
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const project = await getProjectBySlug(supabase, slug).catch((e: { code?: string }) => {
+  const project = await getProjectBySlug(admin, slug).catch((e: { code?: string }) => {
     if (e?.code === 'PGRST116') return null
     throw e
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -83,12 +88,6 @@ export default async function StoryPage({ params }: StoryPageProps) {
   if (!project) return notFound()
 
   const SIGNED_URL_EXPIRY = 60 * 60 * 24 * 365 // 1 year
-
-  // Use the admin client (service role) to generate signed URLs so that any
-  // visitor — authenticated or not — can view the story's photos. The route
-  // handler client uses the visitor's session and would fail for guests because
-  // the private bucket's RLS policy blocks createSignedUrl for non-owners.
-  const admin = createAdminClient()
 
   // ── Assets (photos / videos) ────────────────────────────────────
   const assetsWithUrls = await Promise.all(
@@ -135,7 +134,7 @@ export default async function StoryPage({ params }: StoryPageProps) {
 
   try {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: musicRows } = await (supabase as any)
+    const { data: musicRows } = await (admin as any)
       .from('project_music')
       .select('track_title, artist_name, provider, video_id, thumbnail_url, storage_path, external_url')
       .eq('project_id', project.id as string)
@@ -180,7 +179,7 @@ export default async function StoryPage({ params }: StoryPageProps) {
   let hiddenSurprises: { id: string; memory_id: string | null; message: string; emoji: string; position: number }[] = []
   try {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: surpriseRows } = await (supabase as any)
+    const { data: surpriseRows } = await (admin as any)
       .from('hidden_surprises')
       .select('id, memory_id, message, emoji, position')
       .eq('project_id', project.id as string)
@@ -201,7 +200,7 @@ export default async function StoryPage({ params }: StoryPageProps) {
   let futureProp: { message: string; revealAt: string; hintText?: string | null } | null = null
   try {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: futureRows } = await (supabase as any)
+    const { data: futureRows } = await (admin as any)
       .from('future_messages')
       .select('message, reveal_at, hint_text')
       .eq('project_id', project.id as string)
