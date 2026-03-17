@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import { createRouteHandlerClient } from '@/lib/supabase/server'
-import { getProjectBySlug } from '@loverecap/database'
+import { getProjectBySlug, createAdminClient } from '@loverecap/database'
 import { StoryExperience } from '@/components/public-story/story-experience'
 
 interface StoryPageProps {
@@ -84,10 +84,16 @@ export default async function StoryPage({ params }: StoryPageProps) {
 
   const SIGNED_URL_EXPIRY = 60 * 60 * 24 * 365 // 1 year
 
+  // Use the admin client (service role) to generate signed URLs so that any
+  // visitor — authenticated or not — can view the story's photos. The route
+  // handler client uses the visitor's session and would fail for guests because
+  // the private bucket's RLS policy blocks createSignedUrl for non-owners.
+  const admin = createAdminClient()
+
   // ── Assets (photos / videos) ────────────────────────────────────
   const assetsWithUrls = await Promise.all(
     ((project.assets ?? []) as RawAsset[]).map(async (asset) => {
-      const { data } = await supabase.storage
+      const { data } = await admin.storage
         .from(asset.storage_bucket)
         .createSignedUrl(asset.storage_path, SIGNED_URL_EXPIRY)
       return { ...asset, url: data?.signedUrl ?? '' }
@@ -151,7 +157,7 @@ export default async function StoryPage({ params }: StoryPageProps) {
         // Legacy: resolve audio URL from storage or external
         let audioUrl = musicRow.external_url ?? ''
         if (!audioUrl && musicRow.storage_path) {
-          const { data } = await supabase.storage
+          const { data } = await admin.storage
             .from('project-assets')
             .createSignedUrl(musicRow.storage_path, SIGNED_URL_EXPIRY)
           audioUrl = data?.signedUrl ?? ''
