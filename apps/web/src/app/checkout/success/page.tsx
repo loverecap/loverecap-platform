@@ -11,7 +11,7 @@ interface CheckoutSuccessPageProps {
 
 export default async function CheckoutSuccessPage({ searchParams }: CheckoutSuccessPageProps) {
   const { slug } = await searchParams
-  const storyHref = slug ? `/story/${slug}` : '/'
+  const storyHref = slug ? `/s/${slug}` : '/'
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-white px-4 text-center">

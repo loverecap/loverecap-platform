@@ -27,7 +27,7 @@ export async function sendStoryReadyEmail({
   const client = getClient()
   if (!client) { warnMissing('sendStoryReadyEmail'); return }
 
-  const storyUrl = `${env.appUrl()}/story/${slug}`
+  const storyUrl = `${env.appUrl()}/s/${slug}`
 
   await client.emails.send({
     from: FROM,
@@ -57,7 +57,7 @@ export async function sendAccountSetupEmail({
   const client = getClient()
   if (!client) { warnMissing('sendAccountSetupEmail'); return }
 
-  const storyUrl = `${env.appUrl()}/story/${slug}`
+  const storyUrl = `${env.appUrl()}/s/${slug}`
 
   await client.emails.send({
     from: FROM,
