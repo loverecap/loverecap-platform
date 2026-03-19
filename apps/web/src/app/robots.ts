@@ -1,6 +1,7 @@
 import type { MetadataRoute } from 'next'
 
-const APP_URL = process.env['NEXT_PUBLIC_APP_URL'] ?? 'https://loverecap.app'
+const APP_URL =
+  process.env['NEXT_PUBLIC_APP_URL'] ?? 'https://loverecap.app'
 
 export default function robots(): MetadataRoute.Robots {
   return {
@@ -8,8 +9,14 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: '*',
         allow: '/',
-        // Keep builder, checkout, and API routes out of search indexes.
-        disallow: ['/api/', '/create/', '/checkout/'],
+        disallow: [
+          '/api',
+          '/create',
+          '/checkout',
+          '/dashboard',
+          '/login',
+          '/admin',
+        ],
       },
     ],
     sitemap: `${APP_URL}/sitemap.xml`,
