@@ -63,7 +63,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
           {project.status === 'published' && project.slug ? (
             <>
               <Link
-                href={`/s/${project.slug}`}
+                href={`/story/${project.slug}`}
                 className="flex-1 inline-flex items-center justify-center gap-1.5 bg-[#FF4D6D] text-white text-xs font-semibold px-3 py-2 rounded-full hover:bg-[#FF2E63] transition-colors"
               >
                 <ExternalLink className="h-3.5 w-3.5" />

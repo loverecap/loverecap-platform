@@ -64,7 +64,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     if (projects?.length) {
       storyPages = projects.map((p) => ({
-        url: `${APP_URL}/s/${p.slug}`,
+        url: `${APP_URL}/story/${p.slug}`,
         lastModified: p.updated_at ? new Date(p.updated_at) : now,
         changeFrequency: 'monthly' as const,
         priority: 0.5,

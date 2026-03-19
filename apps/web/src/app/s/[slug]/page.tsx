@@ -231,7 +231,7 @@ export default async function StoryPage({ params }: StoryPageProps) {
       coverUrl={coverAsset?.url ?? null}
       finalMessage={project.final_message as string | null}
       authorName={project.partner_name_1 as string}
-      shareUrl={`${appUrl}/s/${slug}`}
+      shareUrl={`${appUrl}/story/${slug}`}
       shareTitle={`${project.partner_name_1 as string} & ${project.partner_name_2 as string} — LoveRecap`}
       music={musicProp}
       hiddenSurprises={hiddenSurprises}
