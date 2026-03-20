@@ -7,10 +7,12 @@ import { Share2, Check, Link } from 'lucide-react'
 interface StoryShareBarProps {
   url: string
   title: string
+  isHidden?: boolean
 }
 
-export function StoryShareBar({ url, title }: StoryShareBarProps) {
+export function StoryShareBar({ url, title, isHidden = false }: StoryShareBarProps) {
   const [copied, setCopied] = useState(false)
+  const [hasEntered, setHasEntered] = useState(false)
 
   async function handleCopy() {
     try {
@@ -35,8 +37,13 @@ export function StoryShareBar({ url, title }: StoryShareBarProps) {
   return (
     <motion.div
       initial={{ y: 88, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ delay: 0.6, type: 'spring', stiffness: 200, damping: 26 }}
+      animate={{ y: isHidden ? 88 : 0, opacity: isHidden ? 0 : 1 }}
+      transition={
+        hasEntered
+          ? { type: 'spring', stiffness: 300, damping: 30 }
+          : { delay: 0.6, type: 'spring', stiffness: 200, damping: 26 }
+      }
+      onAnimationComplete={() => { if (!hasEntered) setHasEntered(true) }}
       className="fixed bottom-0 left-0 right-0 z-50 border-t border-[#F8C8DC]/30 bg-white/95 px-4 py-3 backdrop-blur-md"
     >
       <div className="flex gap-2.5 max-w-sm mx-auto">

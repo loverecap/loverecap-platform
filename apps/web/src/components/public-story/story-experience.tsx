@@ -92,6 +92,7 @@ export function StoryExperience({
   futureMessage,
 }: StoryExperienceProps) {
   const [started, setStarted] = useState(false)
+  const [lightboxOpen, setLightboxOpen] = useState(false)
   const reduce = useReducedMotion()
 
   const memoriesWithAssets = memories.map((m) => ({
@@ -153,13 +154,14 @@ export function StoryExperience({
                 <StoryTimeline
                   memories={memoriesWithAssets}
                   hiddenSurprises={hiddenSurprises}
+                  onLightboxChange={setLightboxOpen}
                 />
               </SectionReveal>
             )}
 
             {projectAssets.length > 0 && (
               <SectionReveal>
-                <StoryGallery assets={projectAssets} />
+                <StoryGallery assets={projectAssets} onLightboxChange={setLightboxOpen} />
               </SectionReveal>
             )}
 
@@ -293,7 +295,7 @@ export function StoryExperience({
         )}
       </AnimatePresence>
 
-      {started && shareUrl && <StoryShareBar url={shareUrl} title={shareTitle} />}
+      {started && shareUrl && <StoryShareBar url={shareUrl} title={shareTitle} isHidden={lightboxOpen} />}
     </>
   )
 }

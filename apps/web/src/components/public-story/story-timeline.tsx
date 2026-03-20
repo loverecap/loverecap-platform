@@ -35,6 +35,7 @@ interface HiddenSurprise {
 interface StoryTimelineProps {
   memories: TimelineMemory[]
   hiddenSurprises?: HiddenSurprise[]
+  onLightboxChange?: (open: boolean) => void
 }
 
 const CARD_GRADIENTS = [
@@ -45,9 +46,19 @@ const CARD_GRADIENTS = [
   'linear-gradient(135deg, #FFDDE8 0%, #F8A8C0 100%)',
 ]
 
-export function StoryTimeline({ memories, hiddenSurprises = [] }: StoryTimelineProps) {
+export function StoryTimeline({ memories, hiddenSurprises = [], onLightboxChange }: StoryTimelineProps) {
   const reduce = useReducedMotion()
   const [activeMemory, setActiveMemory] = useState<TimelineMemory | null>(null)
+
+  function openModal(memory: TimelineMemory) {
+    setActiveMemory(memory)
+    onLightboxChange?.(true)
+  }
+
+  function closeModal() {
+    setActiveMemory(null)
+    onLightboxChange?.(false)
+  }
 
   if (memories.length === 0) return null
 
@@ -105,7 +116,7 @@ export function StoryTimeline({ memories, hiddenSurprises = [] }: StoryTimelineP
                   scale: 1.02,
                   boxShadow: '0 12px 48px rgba(0,0,0,0.18), 0 2px 8px rgba(0,0,0,0.08)',
                 }}
-                onClick={() => setActiveMemory(memory)}
+                onClick={() => openModal(memory)}
                 className="relative overflow-hidden rounded-3xl cursor-pointer"
                 style={{
                   aspectRatio: isFirst ? '4/3' : photo ? '3/2' : undefined,
@@ -242,7 +253,7 @@ export function StoryTimeline({ memories, hiddenSurprises = [] }: StoryTimelineP
           ...activeMemory,
           photoUrl: activeMemory.assets?.find((a) => a.asset_type === 'image')?.url ?? null,
         } : null}
-        onClose={() => setActiveMemory(null)}
+        onClose={closeModal}
       />
     </section>
   )

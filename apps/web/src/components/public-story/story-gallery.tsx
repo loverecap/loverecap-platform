@@ -13,14 +13,25 @@ interface GalleryAsset {
 
 interface StoryGalleryProps {
   assets: GalleryAsset[]
+  onLightboxChange?: (open: boolean) => void
 }
 
-export function StoryGallery({ assets }: StoryGalleryProps) {
+export function StoryGallery({ assets, onLightboxChange }: StoryGalleryProps) {
   const photos = assets.filter((a) => a.asset_type === 'image')
   const reduce = useReducedMotion()
   const scrollRef = useRef<HTMLDivElement>(null)
   const [active, setActive] = useState(0)
   const [lightbox, setLightbox] = useState<string | null>(null)
+
+  function openLightbox(url: string) {
+    setLightbox(url)
+    onLightboxChange?.(true)
+  }
+
+  function closeLightbox() {
+    setLightbox(null)
+    onLightboxChange?.(false)
+  }
 
   if (photos.length === 0) return null
 
@@ -79,7 +90,7 @@ export function StoryGallery({ assets }: StoryGalleryProps) {
             <div
               className="relative overflow-hidden rounded-3xl cursor-pointer"
               style={{ aspectRatio: '3/4', boxShadow: '0 16px 48px rgba(0,0,0,0.14)' }}
-              onClick={() => setLightbox(photos[0]!.url)}
+              onClick={() => openLightbox(photos[0]!.url)}
             >
               <Image
                 src={photos[0]!.url}
@@ -126,7 +137,7 @@ export function StoryGallery({ assets }: StoryGalleryProps) {
                     if (active !== i) {
                       scrollTo(i)
                     } else {
-                      setLightbox(photo.url)
+                      openLightbox(photo.url)
                     }
                   }}
                 >
@@ -217,7 +228,7 @@ export function StoryGallery({ assets }: StoryGalleryProps) {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.22 }}
             className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 px-5"
-            onClick={() => setLightbox(null)}
+            onClick={closeLightbox}
           >
             
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -255,7 +266,7 @@ export function StoryGallery({ assets }: StoryGalleryProps) {
               <motion.button
                 whileHover={reduce ? {} : { scale: 1.1 }}
                 whileTap={reduce ? {} : { scale: 0.92 }}
-                onClick={() => setLightbox(null)}
+                onClick={closeLightbox}
                 className="absolute -top-4 -right-2 flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-lg cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF4D6D] focus-visible:ring-offset-2"
                 aria-label="Fechar"
               >

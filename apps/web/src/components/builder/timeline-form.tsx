@@ -283,10 +283,11 @@ export function TimelineForm() {
 
         const { asset_id, signed_url } = signJson.data!
 
+        const fileBuffer = await pendingPhoto.file.arrayBuffer()
         const uploadRes = await fetch(signed_url, {
           method: 'PUT',
           headers: { 'Content-Type': pendingPhoto.file.type },
-          body: pendingPhoto.file,
+          body: fileBuffer,
         })
 
         if (!uploadRes.ok) throw new Error('Erro ao enviar foto. Tente novamente.')
@@ -541,7 +542,7 @@ export function TimelineForm() {
                       <FormControl>
                         <Input
                           placeholder="Ex: Primeira viagem juntos"
-                          autoCapitalize="words"
+                          autoCapitalize="off"
                           maxLength={120}
                           {...field}
                           onChange={(e) => field.onChange(toTitleCase(e.target.value))}
