@@ -124,7 +124,7 @@ export type Database = {
           title: string
           short_description: string | null
           description: string | null
-          occurred_at: string
+          occurred_at: string | null
           emoji: string | null
           position: number
           created_at: string
@@ -136,7 +136,7 @@ export type Database = {
           title: string
           short_description?: string | null
           description?: string | null
-          occurred_at?: string
+          occurred_at?: string | null
           emoji?: string | null
           position?: number
           created_at?: string

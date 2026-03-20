@@ -41,6 +41,7 @@ supabase/.temp
 #IA
 .claude
 ai-context
+CLAUDE.md
 
 #Docs
 docs

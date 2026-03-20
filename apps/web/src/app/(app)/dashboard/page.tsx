@@ -9,7 +9,8 @@ import { Button } from '@/components/ui/button'
 import { Nav } from '@/components/shared/nav'
 
 export const metadata: Metadata = {
-  title: 'Meus LoveRecaps | LoveRecap',
+  title: 'Meus LoveRecaps',
+  robots: { index: false, follow: false },
 }
 
 export default async function DashboardPage() {

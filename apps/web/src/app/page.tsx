@@ -7,21 +7,49 @@ import { Benefits } from '@/components/marketing/benefits'
 import { PricingSection } from '@/components/marketing/pricing-section'
 import { FaqSection } from '@/components/marketing/faq-section'
 
+const APP_URL = process.env['NEXT_PUBLIC_APP_URL'] ?? 'https://loverecap.app'
+
 export const metadata: Metadata = {
-  title: 'LoveRecap — Transforme sua história de amor em uma memória linda',
+  title: {
+    absolute: 'LoveRecap — Transforme sua história de amor em uma memória linda',
+  },
   description:
-    'Crie um retrospecto visual incrível da sua história de amor. Preencha sua história, envie fotos e compartilhe com quem você ama. Pagamento único. Seu para sempre.',
+    'Crie um retrospecto visual da sua história de amor. Adicione memórias, fotos e uma mensagem especial. Compartilhe com quem você ama. Pagamento único, fica online para sempre.',
+  alternates: {
+    canonical: APP_URL,
+  },
   openGraph: {
     title: 'LoveRecap — Transforme sua história de amor em uma memória linda',
     description:
-      'Crie um retrospecto visual da sua história de amor. Preencha sua história, envie fotos e compartilhe.',
+      'Crie um retrospecto visual da sua história de amor. Adicione memórias, fotos e uma mensagem especial. Compartilhe com quem você ama.',
+    url: APP_URL,
     type: 'website',
   },
+  twitter: {
+    title: 'LoveRecap — Transforme sua história de amor em uma memória linda',
+    description:
+      'Crie um retrospecto visual da sua história de amor. Adicione memórias, fotos e uma mensagem especial.',
+  },
+}
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: 'LoveRecap',
+  url: APP_URL,
+  logo: `${APP_URL}/icon.png`,
+  description:
+    'Plataforma para criar retróspecos visuais de histórias de amor. Adicione memórias, fotos e mensagens especiais.',
+  sameAs: [`${APP_URL}`],
 }
 
 export default function HomePage() {
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <Nav />
       <main>
         <Hero />

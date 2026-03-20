@@ -66,10 +66,13 @@ ${startDate ? `- Juntos desde: ${startDate}` : ''}
 ${memoriesContext}
 
 Regras:
-- Entre 80 e 200 palavras
-- Tom íntimo, caloroso e poético — mas humano, não artificial
-- Mencione os nomes ${partnerName1} e ${partnerName2} de forma natural ao longo do texto
-- Evite clichês óbvios como "cada dia ao seu lado" ou "você completa minha vida"
+- Entre 80 e 150 palavras (máximo 1000 caracteres)
+- Tom íntimo, caloroso e direto ao coração — humano, não artificial
+- Mencione os nomes ${partnerName1} e ${partnerName2} de forma natural
+- Foque exclusivamente nos sentimentos do casal e nas memórias compartilhadas
+- NÃO mencione clima, estações do ano, horários, temperatura, lua, sol, estrelas ou elementos da natureza
+- Evite metáforas longas ou poéticas demais — seja genuíno e simples
+- Evite clichês como "cada dia ao seu lado" ou "você completa minha vida"
 - Não use emojis
 - Escreva como se fosse a própria pessoa escrevendo para o(a) parceiro(a)
 - Não adicione saudação inicial nem assinatura final — apenas a mensagem em si
@@ -77,13 +80,14 @@ Regras:
 
     const completion = await groq.chat.completions.create({
       model: 'llama-3.1-8b-instant',
-      max_tokens: 400,
+      max_tokens: 320,
       temperature: 0.9,
       messages: [{ role: 'user', content: prompt }],
     })
 
-    const text = completion.choices[0]?.message?.content?.trim() ?? ''
-    if (!text) throw new Error('Resposta vazia')
+    const raw = completion.choices[0]?.message?.content?.trim() ?? ''
+    if (!raw) throw new Error('Resposta vazia')
+    const text = raw.slice(0, 1000)
 
     return NextResponse.json({ message: text })
   } catch (err) {

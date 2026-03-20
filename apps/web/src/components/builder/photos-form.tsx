@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef } from 'react'
+import { useRef, useEffect } from 'react'
 import { ImagePlus, X, Loader2, ArrowRight, ArrowLeft, Image as ImageIcon } from 'lucide-react'
 import { toast } from 'sonner'
 import Image from 'next/image'
@@ -17,6 +17,15 @@ export function PhotosForm() {
   const router = useRouter()
   const [uploading, setUploading] = useState<string[]>([])
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  // Bug 2 fix: reset file input when window regains focus (Android back button dismisses picker)
+  useEffect(() => {
+    const handleFocus = () => {
+      if (fileInputRef.current) fileInputRef.current.value = ''
+    }
+    window.addEventListener('focus', handleFocus)
+    return () => window.removeEventListener('focus', handleFocus)
+  }, [])
 
   const photos = state.uploadedPhotos
 

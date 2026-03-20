@@ -128,7 +128,13 @@ export function StoryGallery({ assets }: StoryGalleryProps) {
                   transition={{ duration: 0.5, delay: Math.min(i * 0.07, 0.28), ease: 'easeOut' }}
                   className="shrink-0 cursor-pointer"
                   style={{ width: '78%', scrollSnapAlign: 'center' }}
-                  onClick={() => setLightbox(photo.url)}
+                  onClick={() => {
+                    if (active !== i) {
+                      scrollTo(i)
+                    } else {
+                      setLightbox(photo.url)
+                    }
+                  }}
                 >
                   {/* Card — scale & shadow change based on active */}
                   <div

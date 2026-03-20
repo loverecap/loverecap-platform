@@ -3,7 +3,10 @@ import Link from 'next/link'
 import { CheckCircle2, Share2, Heart } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
-export const metadata: Metadata = { title: 'Pagamento confirmado' }
+export const metadata: Metadata = {
+  title: 'Pagamento confirmado — Sua história está no ar!',
+  robots: { index: false, follow: false },
+}
 
 interface CheckoutSuccessPageProps {
   searchParams: Promise<{ slug?: string }>

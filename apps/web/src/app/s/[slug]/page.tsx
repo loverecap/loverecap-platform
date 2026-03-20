@@ -57,12 +57,32 @@ export async function generateMetadata({ params }: StoryPageProps): Promise<Meta
 
   if (!project) return { title: 'História não encontrada | LoveRecap' }
 
+  const appUrl = process.env['NEXT_PUBLIC_APP_URL'] ?? 'https://loverecap.app'
+  const names = `${project.partner_name_1 as string} & ${project.partner_name_2 as string}`
+  const pageUrl = `${appUrl}/s/${slug}`
+
   return {
-    title: `${project.partner_name_1 as string} & ${project.partner_name_2 as string} — LoveRecap`,
-    description: 'Uma história de amor especial, criada com carinho no LoveRecap.',
+    title: `${names} — LoveRecap`,
+    description: `A história de amor de ${names}, guardada com carinho no LoveRecap. Uma linha do tempo de momentos especiais para nunca esquecer.`,
+    alternates: {
+      canonical: pageUrl,
+    },
     openGraph: {
-      title: `${project.partner_name_1 as string} & ${project.partner_name_2 as string}`,
-      description: 'Uma história de amor espera por você.',
+      title: `${names} — LoveRecap`,
+      description: `A história de amor de ${names}, guardada com carinho no LoveRecap.`,
+      url: pageUrl,
+      type: 'website',
+      locale: 'pt_BR',
+      siteName: 'LoveRecap',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `${names} — LoveRecap`,
+      description: `A história de amor de ${names}, guardada com carinho no LoveRecap.`,
+    },
+    robots: {
+      index: true,
+      follow: true,
     },
   }
 }
@@ -220,8 +240,26 @@ export default async function StoryPage({ params }: StoryPageProps) {
 
   const appUrl = process.env['NEXT_PUBLIC_APP_URL'] ?? 'https://loverecap.app'
 
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name: `${project.partner_name_1 as string} & ${project.partner_name_2 as string} — LoveRecap`,
+    description: `A história de amor de ${project.partner_name_1 as string} & ${project.partner_name_2 as string}, guardada com carinho no LoveRecap.`,
+    url: `${appUrl}/s/${slug}`,
+    publisher: {
+      '@type': 'Organization',
+      name: 'LoveRecap',
+      url: appUrl,
+    },
+  }
+
   return (
-    <StoryExperience
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <StoryExperience
       partnerName1={project.partner_name_1 as string}
       partnerName2={project.partner_name_2 as string}
       startDate={project.relationship_start_date as string}
@@ -237,5 +275,6 @@ export default async function StoryPage({ params }: StoryPageProps) {
       hiddenSurprises={hiddenSurprises}
       futureMessage={futureProp}
     />
+    </>
   )
 }

@@ -4,8 +4,9 @@ import { createRouteHandlerClient } from '@/lib/supabase/server'
 import { SignInForm } from '@/components/auth/sign-in-form'
 
 export const metadata: Metadata = {
-  title: 'Entrar | LoveRecap',
+  title: 'Entrar',
   description: 'Acesse sua conta e veja suas histórias de amor.',
+  robots: { index: false, follow: false },
 }
 
 export default async function SignInPage({
