@@ -12,21 +12,7 @@ import { env } from '@/lib/env'
 import { createLogger } from '@/lib/logger'
 import { sendStoryReadyEmail, sendAccountSetupEmail } from '@/lib/email'
 
-// POST /api/webhooks/abacatepay
-// Receives payment status updates from AbacatePay (Webhook v1).
-//
-// Events subscribed: billing.paid
-//
-// Configure the webhook URL in your AbacatePay dashboard:
-//   https://yourapp.com/api/webhooks/abacatepay
-//
-// AbacatePay Webhook v1 body shape for billing.paid:
-//   { event: "billing.paid"; billing: { id: string; status: string; ... } }
-//
-// Verify with ABACATEPAY_WEBHOOK_SECRET (set in dashboard + .env).
-
 function verifySecret(secret: string, header: string): boolean {
-  // AbacatePay passes the secret as: Authorization: Bearer <secret>
   const token = header.replace(/^Bearer\s+/i, '').trim()
   try {
     return timingSafeEqual(Buffer.from(secret), Buffer.from(token))
@@ -49,16 +35,15 @@ interface WithdrawPayload {
 
 interface WebhookBody {
   event?: string
-  /** Present on billing.paid and billing.disputed */
+  
   billing?: BillingPayload
-  /** Present on withdraw.done and withdraw.failed */
+  
   withdraw?: WithdrawPayload
 }
 
 export async function POST(request: NextRequest) {
   const log = createLogger('webhooks/payments', request)
 
-  // ── Secret verification ───────────────────────────────────────────────
   const secret = env.abacatePayWebhookSecret()
   if (secret) {
     const authHeader = request.headers.get('authorization') ?? ''
@@ -110,7 +95,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ received: true })
   } catch (error) {
     log.error('Unhandled webhook error', { error: String(error) })
-    // Return 500 so AbacatePay retries the delivery
     return NextResponse.json({ error: 'Internal error' }, { status: 500 })
   }
 }
@@ -142,7 +126,6 @@ async function handleBillingPaid(
       await publishProject(admin, project.id, payment.user_id, project.slug)
       log.info('Project published', { projectId: project.id, slug: project.slug })
 
-      // Send email (fire-and-forget — never fail the webhook)
       void sendPostPaymentEmail(admin, payment, project).catch(
         (emailErr) => log.error('Email dispatch failed', { error: String(emailErr) }),
       )
@@ -175,16 +158,13 @@ async function sendPostPaymentEmail(
   const slug = project.slug
 
   if (user.is_anonymous) {
-    // Get email from payment metadata (captured at checkout)
     const customerEmail = (payment.metadata as Record<string, unknown> | null)?.['customer_email'] as string | undefined
     if (!customerEmail) return
 
-    // Upgrade anonymous user to real account by linking email
     await admin.auth.admin.updateUserById(payment.user_id, { email: customerEmail }).catch(
       (e) => console.error('[webhook] updateUserById failed', e),
     )
 
-    // Generate a password-setup link
     const appUrl = process.env['NEXT_PUBLIC_APP_URL'] ?? ''
     const { data: linkData } = await admin.auth.admin.generateLink({
       type: 'recovery',
@@ -215,7 +195,6 @@ async function handleBillingDisputed(
     return
   }
 
-  // Only revert if not already in a terminal state
   if (payment.status !== 'approved' && payment.status !== 'cancelled') return
 
   await updatePaymentStatus(admin, payment.id, 'rejected', billing.id)

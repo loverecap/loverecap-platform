@@ -34,7 +34,6 @@ export default async function Image({ params }: Props) {
     partnerName1 = rows[0]?.partner_name_1 ?? ''
     partnerName2 = rows[0]?.partner_name_2 ?? ''
   } catch {
-    // fail silently — render generic image
   }
 
   const names =
@@ -60,14 +59,12 @@ export default async function Image({ params }: Props) {
           position: 'relative',
         }}
       >
-        {/* Decorative hearts */}
+        
         <div style={{ position: 'absolute', top: 44, left: 68, fontSize: 32, opacity: 0.25 }}>❤️</div>
         <div style={{ position: 'absolute', bottom: 52, right: 76, fontSize: 26, opacity: 0.2 }}>❤️</div>
 
-        {/* Heart icon */}
         <div style={{ fontSize: '72px', marginBottom: '28px', lineHeight: 1 }}>❤️</div>
 
-        {/* Couple names */}
         <p
           style={{
             fontSize,
@@ -82,7 +79,6 @@ export default async function Image({ params }: Props) {
           {names}
         </p>
 
-        {/* Subtitle */}
         <p
           style={{
             fontSize: '24px',
@@ -95,7 +91,6 @@ export default async function Image({ params }: Props) {
           Uma história de amor guardada para sempre
         </p>
 
-        {/* Brand pill */}
         <div
           style={{
             display: 'flex',

@@ -9,8 +9,8 @@ const ALLOWED_MIME_TYPES = [
   'video/webm',
 ] as const
 
-const MAX_IMAGE_BYTES = 10 * 1024 * 1024  // 10 MB
-const MAX_VIDEO_BYTES = 200 * 1024 * 1024 // 200 MB
+const MAX_IMAGE_BYTES = 10 * 1024 * 1024
+const MAX_VIDEO_BYTES = 200 * 1024 * 1024
 
 export const signUploadUrlSchema = z
   .object({

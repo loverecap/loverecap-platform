@@ -1,4 +1,3 @@
-// Brand color palette — keep in sync with Tailwind @theme in globals.css
 export const colors = {
   primary: {
     50: '#fdf2f8',

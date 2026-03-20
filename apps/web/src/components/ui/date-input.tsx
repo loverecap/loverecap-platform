@@ -20,7 +20,6 @@ export const DateInput = ({ className, ...props }: DateInputProps) => {
           'placeholder:text-neutral-400',
           'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF4D6D] focus-visible:ring-offset-2',
           'disabled:cursor-not-allowed disabled:opacity-50',
-          // hide browser built-in calendar icon; the native invisible overlay still handles click-to-open
           '[&::-webkit-calendar-picker-indicator]:opacity-0',
           '[&::-webkit-calendar-picker-indicator]:absolute',
           '[&::-webkit-calendar-picker-indicator]:inset-0',
@@ -30,7 +29,7 @@ export const DateInput = ({ className, ...props }: DateInputProps) => {
         )}
         {...props}
       />
-      {/* Visible calendar icon — clicking it opens the native date picker */}
+      
       <button
         type="button"
         tabIndex={-1}

@@ -66,7 +66,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
   } catch (error) {
     console.warn('Sitemap generation failed:', error)
-    // Não quebra build
   }
 
   return [...staticPages, ...storyPages]

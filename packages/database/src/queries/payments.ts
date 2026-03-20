@@ -7,10 +7,6 @@ export type Payment = Tables<'payments'>
 export type PaymentInsert = TablesInsert<'payments'>
 export type PaymentStatus = Enums<'payment_status'>
 
-// ──────────────────────────────────────────────
-// Read
-// ──────────────────────────────────────────────
-
 export async function getPaymentById(client: DBClient, id: string) {
   const { data, error } = await client
     .from('payments')
@@ -47,10 +43,6 @@ export async function getPaymentsByProject(client: DBClient, projectId: string) 
   return data
 }
 
-// ──────────────────────────────────────────────
-// Write
-// ──────────────────────────────────────────────
-
 export async function createPayment(client: DBClient, payload: PaymentInsert) {
   const { data, error } = await client
     .from('payments')
@@ -84,10 +76,6 @@ export async function updatePaymentStatus(
   return data
 }
 
-// ──────────────────────────────────────────────
-// Event log helpers (append-only audit trail)
-// ──────────────────────────────────────────────
-
 export async function logEvent(
   client: DBClient,
   event: string,
@@ -104,6 +92,5 @@ export async function logEvent(
     payload: (options.payload ?? null) as Json | null,
   })
 
-  // Event log failures should never surface to the caller
   if (error) console.error('[event_log]', error.message)
 }

@@ -7,10 +7,9 @@ import { getMoonPhase } from './moon/moon-utils'
 import { MoonSVG } from './moon/moon-svg'
 
 interface StoryMoonPhaseProps {
-  startDate: string // ISO date string
+  startDate: string
 }
 
-// CSS-only twinkling stars — avoids JS overhead for decorative elements
 const STAR_STYLE = `
   @keyframes twinkle {
     0%, 100% { opacity: 0.15; transform: scale(1); }
@@ -18,7 +17,6 @@ const STAR_STYLE = `
   }
 `
 
-// Static star positions (deterministic — same on every render)
 const STARS = [
   { x: 8,  y: 15, s: 1.5, d: 1.8 },
   { x: 18, y: 32, s: 1.0, d: 2.4 },
@@ -59,9 +57,6 @@ export function StoryMoonPhase({ startDate }: StoryMoonPhaseProps) {
     <section
       aria-label="Fase da lua"
       style={{
-        // Dusk-into-night: cream → warm blush → deep rose → plum → space
-        // 40% transition zone ensures no harsh colour snap
-        // Does NOT return to cream at the bottom — Zodiac continues seamlessly
         background:
           'linear-gradient(180deg,' +
           '#FFF8F2 0%,' +
@@ -75,10 +70,9 @@ export function StoryMoonPhase({ startDate }: StoryMoonPhaseProps) {
         overflow: 'hidden',
       }}
     >
-      {/* Inject CSS for star twinkle animations */}
+      
       <style>{STAR_STYLE}</style>
 
-      {/* Background stars (CSS-only) */}
       <div
         aria-hidden="true"
         style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}
@@ -101,7 +95,6 @@ export function StoryMoonPhase({ startDate }: StoryMoonPhaseProps) {
         ))}
       </div>
 
-      {/* Nebula glow blobs (CSS-only, subtle) */}
       <div
         aria-hidden="true"
         style={{
@@ -115,7 +108,7 @@ export function StoryMoonPhase({ startDate }: StoryMoonPhaseProps) {
       />
 
       <div className="relative z-10 px-5 py-24 max-w-lg mx-auto">
-        {/* Section label */}
+        
         <motion.div
           initial={reduce ? {} : { opacity: 0, y: 20 }}
           whileInView={reduce ? {} : { opacity: 1, y: 0 }}
@@ -141,7 +134,6 @@ export function StoryMoonPhase({ startDate }: StoryMoonPhaseProps) {
           />
         </motion.div>
 
-        {/* Moon SVG */}
         <motion.div
           initial={reduce ? {} : { opacity: 0, scale: 0.8 }}
           whileInView={reduce ? {} : { opacity: 1, scale: 1 }}
@@ -150,7 +142,7 @@ export function StoryMoonPhase({ startDate }: StoryMoonPhaseProps) {
           className="mx-auto mb-8"
           style={{ maxWidth: 200 }}
         >
-          {/* Floating animation wrapper */}
+          
           <motion.div
             animate={reduce ? {} : { y: [0, -10, 0] }}
             transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
@@ -159,7 +151,6 @@ export function StoryMoonPhase({ startDate }: StoryMoonPhaseProps) {
           </motion.div>
         </motion.div>
 
-        {/* Phase info card */}
         <motion.div
           initial={reduce ? {} : { opacity: 0, y: 24 }}
           whileInView={reduce ? {} : { opacity: 1, y: 0 }}
@@ -172,7 +163,7 @@ export function StoryMoonPhase({ startDate }: StoryMoonPhaseProps) {
             backdropFilter: 'blur(8px)',
           }}
         >
-          {/* Big emoji + phase name */}
+          
           <div className="flex items-center justify-center gap-3 mb-3">
             <span className="text-4xl" role="img" aria-label={moon.name}>{moon.emoji}</span>
             <div className="text-left">
@@ -185,14 +176,12 @@ export function StoryMoonPhase({ startDate }: StoryMoonPhaseProps) {
             </div>
           </div>
 
-          {/* Date line */}
           <p className="text-sm mb-4" style={{ color: 'rgba(255,255,255,0.55)' }}>
             Em <span style={{ color: '#E89AAE', fontWeight: 600 }}>{formattedDate}</span>
             {' '}a lua estava em{' '}
             <span style={{ color: '#F8F4EF', fontWeight: 600 }}>{moon.name.toLowerCase()}</span>
           </p>
 
-          {/* Romantic caption */}
           <p
             className="text-sm leading-relaxed italic"
             style={{ color: 'rgba(255,255,255,0.45)' }}

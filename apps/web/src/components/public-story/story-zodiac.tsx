@@ -7,10 +7,9 @@ import { CONSTELLATION_MAP } from './zodiac/constellation-data'
 import { ConstellationSVG } from './zodiac/constellation-svg'
 
 interface StoryZodiacProps {
-  startDate: string // ISO date string
+  startDate: string
 }
 
-// CSS-only nebula + star field (NOT Framer Motion — avoids JS overhead)
 const NEBULA_STYLE = `
   @keyframes nebula-drift {
     0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.12; }
@@ -40,7 +39,6 @@ export function StoryZodiac({ startDate }: StoryZodiacProps) {
   const zodiac = useMemo(() => getZodiacSign(startDate), [startDate])
   const constellation = CONSTELLATION_MAP[zodiac.sign]
 
-  // Trigger constellation reveal when section comes into view
   const [revealed, setRevealed] = useState(false)
 
   if (!constellation) return null
@@ -49,9 +47,6 @@ export function StoryZodiac({ startDate }: StoryZodiacProps) {
     <section
       aria-label="Constelação do zodíaco"
       style={{
-        // Seamless dark entry from Moon Phase, then night-into-dawn exit:
-        // space → plum → deep rose → warm blush → cream
-        // 38% exit transition zone — mirrors dusk entry for visual rhythm
         background:
           'linear-gradient(180deg,' +
           '#0A0B14 0%,' +
@@ -67,7 +62,6 @@ export function StoryZodiac({ startDate }: StoryZodiacProps) {
     >
       <style>{NEBULA_STYLE}</style>
 
-      {/* Background star field (CSS-only) */}
       <div aria-hidden="true" style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
         {BG_STARS.map((star, i) => (
           <div
@@ -87,7 +81,6 @@ export function StoryZodiac({ startDate }: StoryZodiacProps) {
         ))}
       </div>
 
-      {/* Nebula glow blobs (CSS-only) */}
       <div
         aria-hidden="true"
         style={{
@@ -124,7 +117,7 @@ export function StoryZodiac({ startDate }: StoryZodiacProps) {
       </div>
 
       <div className="relative z-10 px-5 py-24 max-w-lg mx-auto">
-        {/* Section header */}
+        
         <motion.div
           initial={reduce ? {} : { opacity: 0, y: 20 }}
           whileInView={reduce ? {} : { opacity: 1, y: 0 }}
@@ -150,7 +143,6 @@ export function StoryZodiac({ startDate }: StoryZodiacProps) {
           />
         </motion.div>
 
-        {/* Constellation SVG */}
         <motion.div
           initial={reduce ? {} : { opacity: 0, scale: 0.9 }}
           whileInView={reduce ? {} : { opacity: 1, scale: 1 }}
@@ -162,7 +154,6 @@ export function StoryZodiac({ startDate }: StoryZodiacProps) {
           <ConstellationSVG data={constellation} revealed={revealed} />
         </motion.div>
 
-        {/* Sign info card */}
         <motion.div
           initial={reduce ? {} : { opacity: 0, y: 24 }}
           whileInView={reduce ? {} : { opacity: 1, y: 0 }}
@@ -175,7 +166,7 @@ export function StoryZodiac({ startDate }: StoryZodiacProps) {
             backdropFilter: 'blur(8px)',
           }}
         >
-          {/* Sign name + emoji */}
+          
           <div className="flex items-center gap-3 mb-3">
             <span className="text-3xl" role="img" aria-label={zodiac.name_pt}>{zodiac.emoji}</span>
             <div>
@@ -191,14 +182,12 @@ export function StoryZodiac({ startDate }: StoryZodiacProps) {
             </div>
           </div>
 
-          {/* Context sentence */}
           <p className="text-sm mb-4" style={{ color: 'rgba(255,255,255,0.55)' }}>
             Quando a história de vocês começou, a constelação de{' '}
             <span style={{ color: '#E89AAE', fontWeight: 600 }}>{zodiac.name_pt}</span>{' '}
             guiava o céu
           </p>
 
-          {/* Romantic tagline */}
           <p
             className="text-sm leading-relaxed italic"
             style={{ color: 'rgba(255,255,255,0.45)' }}

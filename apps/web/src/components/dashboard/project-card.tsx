@@ -28,7 +28,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
 
   return (
     <div className="group relative bg-white rounded-2xl border border-neutral-200 overflow-hidden shadow-sm hover:shadow-md hover:border-[#FF4D6D]/30 transition-all duration-200">
-      {/* Cover / gradient header */}
+      
       <div
         className="h-28 w-full flex items-center justify-center"
         style={{
@@ -38,27 +38,23 @@ export function ProjectCard({ project }: ProjectCardProps) {
         <Heart className="h-8 w-8 fill-[#FF4D6D]/40 text-[#FF4D6D]/40" />
       </div>
 
-      {/* Content */}
       <div className="p-5">
-        {/* Status badge */}
+        
         <span className={`inline-block text-[10px] font-semibold uppercase tracking-widest rounded-full px-2.5 py-1 mb-3 ${status.className}`}>
           {status.label}
         </span>
 
-        {/* Names */}
         <h3 className="font-heading font-bold text-neutral-900 text-lg leading-tight mb-1">
           {project.partner_name_1}
           <span className="text-[#FF4D6D]"> & </span>
           {project.partner_name_2}
         </h3>
 
-        {/* Start date */}
         <p className="flex items-center gap-1.5 text-xs text-neutral-500 mb-4">
           <Calendar className="h-3.5 w-3.5 shrink-0" />
           Desde {formattedDate}
         </p>
 
-        {/* Actions */}
         <div className="flex gap-2">
           {project.status === 'published' && project.slug ? (
             <>

@@ -31,13 +31,12 @@ export function StorySurpriseIntro({ name1, name2, onStart }: StorySurpriseIntro
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5 }}
     >
-      {/* Radial glow */}
+      
       <div
         className="absolute inset-0 pointer-events-none"
         style={{ background: 'radial-gradient(ellipse 70% 60% at 50% 55%, rgba(255,200,220,0.28) 0%, transparent 70%)' }}
       />
 
-      {/* Floating hearts */}
       {FLOATING_HEARTS.map((h, i) => (
         <motion.div
           key={i}
@@ -55,9 +54,8 @@ export function StorySurpriseIntro({ name1, name2, onStart }: StorySurpriseIntro
         </motion.div>
       ))}
 
-      {/* Content */}
       <div className="relative z-10 flex flex-col items-center max-w-sm w-full">
-        {/* Hero heart */}
+        
         <motion.div
           initial={{ scale: 0, rotate: -20 }}
           animate={{ scale: 1, rotate: 0 }}
@@ -110,7 +108,6 @@ export function StorySurpriseIntro({ name1, name2, onStart }: StorySurpriseIntro
           Uma história de amor espera por você
         </motion.p>
 
-        {/* Single CTA */}
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}

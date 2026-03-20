@@ -1,9 +1,5 @@
 import { z } from 'zod'
 
-// ──────────────────────────────────────────────
-// Create
-// ──────────────────────────────────────────────
-
 export const createProjectSchema = z.object({
   title: z.string().min(1, 'Title is required').max(120),
   partner_name_1: z.string().min(1, 'Partner 1 name is required').max(60),
@@ -13,10 +9,6 @@ export const createProjectSchema = z.object({
 })
 
 export type CreateProjectInput = z.infer<typeof createProjectSchema>
-
-// ──────────────────────────────────────────────
-// Update
-// ──────────────────────────────────────────────
 
 export const updateProjectSchema = z.object({
   project_id: z.string().uuid('Invalid project ID'),
@@ -30,10 +22,6 @@ export const updateProjectSchema = z.object({
 })
 
 export type UpdateProjectInput = z.infer<typeof updateProjectSchema>
-
-// ──────────────────────────────────────────────
-// Publish
-// ──────────────────────────────────────────────
 
 export const publishProjectSchema = z.object({
   project_id: z.string().uuid('Invalid project ID'),

@@ -8,8 +8,6 @@ interface StoryPageProps {
   params: Promise<{ slug: string }>
 }
 
-// Cache story pages for 1 hour. Re-fetches in the background while serving
-// the stale page (stale-while-revalidate behaviour via Next.js ISR).
 export const revalidate = 3600
 
 export async function generateMetadata({ params }: StoryPageProps): Promise<Metadata> {

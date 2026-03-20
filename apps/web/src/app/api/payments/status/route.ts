@@ -14,10 +14,6 @@ import { ok, err, unauthorizedError, notFoundError, serverError } from '@/lib/ap
 import { createLogger } from '@/lib/logger'
 import { sendStoryReadyEmail, sendAccountSetupEmail } from '@/lib/email'
 
-// GET /api/payments/status?payment_id=<uuid>
-// Polls AbacatePay for the current PIX status.
-// On PAID: marks payment approved + publishes the project automatically.
-// Returns: { status: 'PENDING' | 'PAID' | 'EXPIRED', slug?: string }
 export async function GET(request: NextRequest) {
   const log = createLogger('payments/status', request)
 
@@ -29,7 +25,6 @@ export async function GET(request: NextRequest) {
   if (!paymentId) return err('payment_id é obrigatório', 400, 'VALIDATION_ERROR')
 
   try {
-    // Fetch payment — RLS ensures only the owner can read it
     const { data: payment, error: payErr } = await supabase
       .from('payments')
       .select('id, status, provider_payment_id, project_id, user_id, metadata')
@@ -39,7 +34,6 @@ export async function GET(request: NextRequest) {
 
     if (payErr || !payment) return notFoundError('Payment')
 
-    // Already confirmed — skip external call and return cached result
     if (payment.status === 'approved') {
       const project = await getProjectById(supabase, payment.project_id).catch(() => null)
       return ok({ status: 'PAID', slug: project?.slug })
@@ -54,11 +48,9 @@ export async function GET(request: NextRequest) {
     if (pixStatus === 'PAID') {
       const admin = createAdminClient()
 
-      // Mark payment as approved
       await updatePaymentStatus(admin, payment.id, 'approved', payment.provider_payment_id)
       log.info('Payment confirmed via polling', { paymentId: payment.id, projectId: payment.project_id })
 
-      // Fetch project to get slug and publish it
       const project = await getProjectById(admin, payment.project_id).catch(() => null)
       const slug = project?.slug ?? ''
 
@@ -66,15 +58,12 @@ export async function GET(request: NextRequest) {
         await publishProject(admin, payment.project_id, payment.user_id, slug)
         log.info('Project auto-published', { projectId: payment.project_id, slug })
 
-        // Send email (fire-and-forget)
         if (project) {
           void sendPostPaymentEmail(admin, user, payment, project, slug).catch(
             (emailErr) => log.error('Email dispatch failed', { error: String(emailErr) }),
           )
         }
       } catch (publishError) {
-        // Payment confirmed even if auto-publish fails (e.g. no memories added).
-        // Project is now in "paid" status and can be published manually.
         log.error('Auto-publish failed after PIX confirmation', { projectId: payment.project_id, error: String(publishError) })
       }
 
@@ -99,8 +88,6 @@ export async function GET(request: NextRequest) {
     return serverError()
   }
 }
-
-// ── Helpers ──────────────────────────────────────────────────────────────────
 
 type AuthUser = NonNullable<Awaited<ReturnType<ReturnType<typeof createAdminClient>['auth']['getUser']>>['data']['user']>
 

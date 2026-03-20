@@ -25,7 +25,6 @@ export function ReviewScreen() {
     )
   }
 
-  // Bug 5: skeleton loading screen while redirect happens after payment
   if (paymentDone) {
     return (
       <div className="flex flex-col items-center gap-8 py-10 text-center">
@@ -38,7 +37,6 @@ export function ReviewScreen() {
           <Loader2 className="h-5 w-5 animate-spin text-neutral-400" />
         </div>
 
-        {/* Skeleton placeholders */}
         <div className="w-full space-y-3">
           <div className="h-44 w-full animate-pulse rounded-2xl bg-neutral-100" />
           <div className="h-5 w-3/4 animate-pulse rounded-lg bg-neutral-100 mx-auto" />
@@ -58,10 +56,9 @@ export function ReviewScreen() {
         </p>
       </div>
 
-      {/* Bug 6: Blurred story preview — creates emotional urgency */}
       {state.info && (
         <div className="relative overflow-hidden rounded-2xl shadow-lg border border-[#FF4D6D]/20">
-          {/* Blurred content */}
+          
           <div
             className="select-none pointer-events-none"
             style={{ filter: 'blur(3.5px)', transform: 'scale(1.02)', transformOrigin: 'center' }}
@@ -100,7 +97,6 @@ export function ReviewScreen() {
             </div>
           </div>
 
-          {/* Lock overlay */}
           <div className="absolute inset-0 flex items-center justify-center bg-white/25 backdrop-blur-[1.5px]">
             <div className="mx-6 w-full max-w-xs rounded-2xl bg-white/95 px-6 py-5 text-center shadow-2xl border border-neutral-100">
               <div className="mb-3 flex justify-center">
@@ -119,7 +115,6 @@ export function ReviewScreen() {
         </div>
       )}
 
-      {/* Pricing card */}
       {state.info && (
         <div className="rounded-xl border border-neutral-200 bg-neutral-50 p-5">
           <div className="flex items-baseline justify-between mb-1">
@@ -147,7 +142,6 @@ export function ReviewScreen() {
         </div>
       )}
 
-      {/* PIX payment or CTA */}
       {showPix && state.projectId ? (
         <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
           <h2 className="font-heading mb-4 text-center text-lg font-semibold text-neutral-900">
@@ -162,7 +156,7 @@ export function ReviewScreen() {
           />
         </div>
       ) : (
-        /* Bug 4: mobile-friendly full-width layout */
+        
         <div className="flex flex-col gap-3">
           <Button
             size="lg"

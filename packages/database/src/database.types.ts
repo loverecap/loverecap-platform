@@ -1,6 +1,3 @@
-// Auto-generated format — keep in sync with supabase/migrations/0001_initial_schema.sql
-// Regenerate after schema changes:
-//   supabase gen types typescript --local > packages/database/src/database.types.ts
 
 export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[]
 
@@ -310,8 +307,6 @@ export type Database = {
         Relationships: []
       }
     }
-    // Using `{}` (not `Record<string, never>`) so Supabase's TablesAndViews<Schema>
-    // intersection doesn't reduce all table types to `never`.
     Views: {}
     Functions: {}
     Enums: {
@@ -332,7 +327,6 @@ export type Database = {
   }
 }
 
-// Convenience type helpers — mirrors Supabase CLI output
 export type Tables<T extends keyof Database['public']['Tables']> =
   Database['public']['Tables'][T]['Row']
 

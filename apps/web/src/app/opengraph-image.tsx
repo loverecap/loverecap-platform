@@ -22,12 +22,11 @@ export default function Image() {
           position: 'relative',
         }}
       >
-        {/* Decorative hearts */}
+        
         <div style={{ position: 'absolute', top: 48, left: 72, fontSize: 36, opacity: 0.25 }}>❤️</div>
         <div style={{ position: 'absolute', bottom: 56, right: 80, fontSize: 28, opacity: 0.2 }}>❤️</div>
         <div style={{ position: 'absolute', top: 120, right: 100, fontSize: 22, opacity: 0.18 }}>❤️</div>
 
-        {/* Logo area */}
         <div
           style={{
             display: 'flex',
@@ -49,7 +48,6 @@ export default function Image() {
           </span>
         </div>
 
-        {/* Tagline */}
         <p
           style={{
             fontSize: '28px',
@@ -64,7 +62,6 @@ export default function Image() {
           Transforme sua história de amor em uma memória linda para sempre
         </p>
 
-        {/* Brand pill */}
         <div
           style={{
             display: 'flex',

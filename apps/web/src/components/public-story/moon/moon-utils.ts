@@ -1,22 +1,17 @@
-// Pure JS moon phase calculator — no external packages
-// Algorithm: Julian Day Number with known new moon anchor
-// Known new moon: Jan 6, 2000 00:00 UTC = JD 2451549.5
-// Synodic period: 29.530588853 days
 
 export interface MoonPhaseResult {
-  phase: number        // 0–1 (0=new, 0.25=first quarter, 0.5=full, 0.75=last quarter)
-  age: number          // days since last new moon (0–29.53)
-  illumination: number // 0–100 percent
-  name: string         // Portuguese phase name
+  phase: number
+  age: number
+  illumination: number
+  name: string
   emoji: string
 }
 
 const SYNODIC = 29.530588853
-const KNOWN_NEW_MOON_JD = 2451549.5 // Jan 6, 2000 UTC
+const KNOWN_NEW_MOON_JD = 2451549.5
 
 function dateToJD(dateStr: string): number {
   const d = new Date(dateStr + 'T12:00:00Z')
-  // Julian Day Number formula
   const y = d.getUTCFullYear()
   const m = d.getUTCMonth() + 1
   const day = d.getUTCDate()
@@ -51,9 +46,8 @@ export function getMoonPhase(dateStr: string): MoonPhaseResult {
   const jd = dateToJD(dateStr)
   const daysSinceAnchor = jd - KNOWN_NEW_MOON_JD
   const cycles = daysSinceAnchor / SYNODIC
-  const phase = cycles - Math.floor(cycles) // 0–1
+  const phase = cycles - Math.floor(cycles)
   const age = phase * SYNODIC
-  // Illumination: approximate — increases from 0 to 100 and back
   const illumination = Math.round((1 - Math.cos(2 * Math.PI * phase)) / 2 * 100)
   const { name, emoji } = getPhaseName(phase)
 

@@ -7,10 +7,6 @@ export type Project = Tables<'projects'>
 export type ProjectInsert = TablesInsert<'projects'>
 export type ProjectUpdate = TablesUpdate<'projects'>
 
-// ──────────────────────────────────────────────
-// Read
-// ──────────────────────────────────────────────
-
 export async function getProjectById(client: DBClient, id: string) {
   const { data, error } = await client
     .from('projects')
@@ -44,10 +40,6 @@ export async function getProjectsByUser(client: DBClient, userId: string) {
   if (error) throw error
   return data
 }
-
-// ──────────────────────────────────────────────
-// Write
-// ──────────────────────────────────────────────
 
 export async function createProject(client: DBClient, payload: ProjectInsert) {
   const { data, error } = await client

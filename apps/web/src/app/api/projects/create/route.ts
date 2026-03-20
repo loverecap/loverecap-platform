@@ -13,9 +13,6 @@ import {
 } from '@/lib/api-response'
 import { rateLimit } from '@/lib/rate-limit'
 
-// POST /api/projects/create
-// Creates a new project in draft status for the authenticated user.
-// Rate limit: 5 projects per user per hour — prevents accidental spam.
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createRouteHandlerClient()
@@ -34,7 +31,6 @@ export async function POST(request: NextRequest) {
     const { title, partner_name_1, partner_name_2, relationship_start_date, theme_id } =
       parsed.data
 
-    // Slug: {name1}-{name2}-{random8} — unique per project
     const slug = `${slugify(partner_name_1)}-${slugify(partner_name_2)}-${generateSlug(8)}`
 
     const project = await createProject(supabase, {
@@ -48,7 +44,6 @@ export async function POST(request: NextRequest) {
       status: 'draft',
     })
 
-    // Fire-and-forget analytics — log after creating project to avoid blocking the response.
     const admin = createAdminClient()
     void logEvent(admin, 'project.draft_created', {
       projectId: project.id,

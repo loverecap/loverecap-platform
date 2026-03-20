@@ -20,7 +20,6 @@ interface MemoryModalProps {
   onClose: () => void
 }
 
-// Matches the gradients used in story-timeline for typographic cards
 const CARD_GRADIENTS = [
   'linear-gradient(135deg, #FFB0C8 0%, #FF4D6D 100%)',
   'linear-gradient(135deg, #F8C8DC 0%, #E89AAE 100%)',
@@ -28,7 +27,6 @@ const CARD_GRADIENTS = [
 ]
 
 export function MemoryModal({ memory, onClose }: MemoryModalProps) {
-  // Dismiss on Escape
   useEffect(() => {
     if (!memory) return
     function onKey(e: KeyboardEvent) {
@@ -38,7 +36,6 @@ export function MemoryModal({ memory, onClose }: MemoryModalProps) {
     return () => window.removeEventListener('keydown', onKey)
   }, [memory, onClose])
 
-  // Lock body scroll when open
   useEffect(() => {
     if (memory) {
       document.body.style.overflow = 'hidden'
@@ -58,7 +55,7 @@ export function MemoryModal({ memory, onClose }: MemoryModalProps) {
           exit={{ opacity: 0 }}
           transition={{ duration: 0.25, ease: 'easeOut' }}
         >
-          {/* Background: photo or gradient */}
+          
           <div className="absolute inset-0">
             {memory.photoUrl ? (
               <Image
@@ -76,7 +73,6 @@ export function MemoryModal({ memory, onClose }: MemoryModalProps) {
               />
             )}
 
-            {/* Heavy bottom gradient for text legibility */}
             <div
               className="absolute inset-0 pointer-events-none"
               style={{
@@ -86,7 +82,6 @@ export function MemoryModal({ memory, onClose }: MemoryModalProps) {
             />
           </div>
 
-          {/* Close button */}
           <div className="relative z-10 flex justify-end p-4">
             <button
               onClick={onClose}
@@ -97,7 +92,6 @@ export function MemoryModal({ memory, onClose }: MemoryModalProps) {
             </button>
           </div>
 
-          {/* Content — bottom anchored */}
           <div className="relative z-10 mt-auto px-6 pb-12">
             <motion.div
               initial={{ opacity: 0, y: 24 }}

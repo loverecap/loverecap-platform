@@ -23,7 +23,7 @@ export function StoryFinalMessage({ message, authorName }: StoryFinalMessageProp
       />
 
       <div className="relative z-10 max-w-sm mx-auto text-center">
-        {/* Header */}
+        
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -57,7 +57,6 @@ export function StoryFinalMessage({ message, authorName }: StoryFinalMessageProp
           </h2>
         </motion.div>
 
-        {/* Reveal interaction */}
         <AnimatePresence mode="wait">
           {!revealed ? (
             <motion.div
@@ -103,10 +102,9 @@ export function StoryFinalMessage({ message, authorName }: StoryFinalMessageProp
               transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
             >
               <div className="relative rounded-2xl bg-white border border-[#F8C8DC]/50 p-7 shadow-xl text-left">
-                {/* Top accent */}
+                
                 <div className="absolute top-0 left-0 right-0 h-1 rounded-t-2xl bg-linear-to-r from-[#FFD0DC] via-[#FF4D6D] to-[#FFD0DC]" />
 
-                {/* Divider */}
                 <div className="flex items-center gap-3 mb-5">
                   <div className="h-px flex-1 bg-linear-to-r from-transparent to-[#F8C8DC]" />
                   <Heart className="h-3.5 w-3.5 fill-[#FF4D6D] text-[#FF4D6D] shrink-0" />

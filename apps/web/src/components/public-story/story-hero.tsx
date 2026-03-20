@@ -36,7 +36,6 @@ function AnimatedNumber({ value }: { value: number }) {
       setDisplay(value)
       return
     }
-    // Count up quickly on mount, then just sync
     const duration = 1800
     const start = Date.now()
     const from = 0
@@ -45,7 +44,6 @@ function AnimatedNumber({ value }: { value: number }) {
     const step = () => {
       const elapsed = Date.now() - start
       const progress = Math.min(elapsed / duration, 1)
-      // ease-out cubic
       const eased = 1 - Math.pow(1 - progress, 3)
       setDisplay(Math.round(from + (value - from) * eased))
       if (progress < 1) id = raf(step)
@@ -55,7 +53,6 @@ function AnimatedNumber({ value }: { value: number }) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  // After animation, stay in sync
   useEffect(() => {
     setDisplay(value)
   }, [value])
@@ -105,7 +102,7 @@ export function StoryHero({ partnerName1, partnerName2, startDate, coverUrl }: S
           : {}),
       }}
     >
-      {/* Cover photo */}
+      
       {hasCover && coverUrl && (
         <>
           <div
@@ -116,17 +113,15 @@ export function StoryHero({ partnerName1, partnerName2, startDate, coverUrl }: S
         </>
       )}
 
-      {/* Decorative blobs (no cover) */}
       {!hasCover && (
         <>
           <div className="absolute top-0 right-0 w-80 h-80 rounded-full bg-[#F8C8DC]/35 -translate-y-1/2 translate-x-1/3 blur-3xl pointer-events-none" />
-          {/* Bottom blob kept INSIDE the section — no translate-y so overflow-hidden doesn't hard-clip it */}
+          
           <div className="absolute bottom-0 left-0 w-72 h-72 rounded-full bg-[#FFE0E8]/22 -translate-x-1/3 -translate-y-1/4 blur-3xl pointer-events-none" />
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 rounded-full bg-[#FFF0F3]/60 blur-3xl pointer-events-none" />
         </>
       )}
 
-      {/* Cover photo — bottom fade to cream, ensures smooth transition to next section */}
       {hasCover && (
         <div
           aria-hidden="true"
@@ -135,9 +130,8 @@ export function StoryHero({ partnerName1, partnerName2, startDate, coverUrl }: S
         />
       )}
 
-      {/* Content */}
       <div className="relative z-10 flex flex-col items-center text-center px-6 py-20 w-full max-w-2xl mx-auto">
-        {/* Label */}
+        
         <motion.div
           initial={reduce ? {} : { opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
@@ -151,7 +145,6 @@ export function StoryHero({ partnerName1, partnerName2, startDate, coverUrl }: S
           <div className={`h-px w-8 ${hasCover ? 'bg-white/40' : 'bg-[#E89AAE]/50'}`} />
         </motion.div>
 
-        {/* Names */}
         <motion.h1
           initial={reduce ? {} : { opacity: 0, y: 28 }}
           animate={{ opacity: 1, y: 0 }}
@@ -164,7 +157,6 @@ export function StoryHero({ partnerName1, partnerName2, startDate, coverUrl }: S
           </span>
         </motion.h1>
 
-        {/* 3-metric live counter */}
         {mounted && (
           <motion.div
             initial={reduce ? {} : { opacity: 0, y: 20 }}
@@ -196,7 +188,6 @@ export function StoryHero({ partnerName1, partnerName2, startDate, coverUrl }: S
           </motion.div>
         )}
 
-        {/* Since date */}
         <motion.div
           initial={reduce ? {} : { opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
@@ -207,7 +198,6 @@ export function StoryHero({ partnerName1, partnerName2, startDate, coverUrl }: S
           <span>Desde {formattedStart}</span>
         </motion.div>
 
-        {/* Years badge */}
         {years > 0 && (
           <motion.div
             initial={reduce ? {} : { opacity: 0, scale: 0.75 }}
@@ -221,7 +211,6 @@ export function StoryHero({ partnerName1, partnerName2, startDate, coverUrl }: S
         )}
       </div>
 
-      {/* Scroll indicator */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}

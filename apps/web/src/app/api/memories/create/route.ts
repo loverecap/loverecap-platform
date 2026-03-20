@@ -12,9 +12,6 @@ import {
   serverError,
 } from '@/lib/api-response'
 
-// POST /api/memories/create
-// Appends a new memory to an existing project's timeline.
-// Position defaults to (current count) so it appears at the end.
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createRouteHandlerClient()
@@ -27,7 +24,6 @@ export async function POST(request: NextRequest) {
 
     const { project_id, title, short_description, description, occurred_at, emoji, position } = parsed.data
 
-    // Verify project ownership
     const project = await getProjectById(supabase, project_id).catch(
       (e: { code?: string }) => {
         if (e?.code === 'PGRST116') return null
@@ -38,7 +34,6 @@ export async function POST(request: NextRequest) {
     if (!project) return notFoundError('Project')
     if (project.user_id !== user.id) return forbiddenError()
 
-    // If no position provided, append to the end
     let resolvedPosition = position
     if (resolvedPosition === undefined) {
       const existing = await getMemoriesByProject(supabase, project_id)

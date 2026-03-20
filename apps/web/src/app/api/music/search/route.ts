@@ -34,14 +34,11 @@ type VideoItem = {
   contentDetails: { duration: string }
 }
 
-// GET /api/music/search?q=<query>
-// Proxies YouTube Data API v3 — never exposes the API key to the client.
 export async function GET(req: NextRequest) {
   if (!YT_KEY) {
     return NextResponse.json({ error: 'YouTube API not configured' }, { status: 500 })
   }
 
-  // Rate limit: 60 searches per IP per 10 minutes
   const ip = getClientIp(req)
   const rl = rateLimit(`music-search:${ip}`, 60, 10 * 60 * 1000)
   if (!rl.success) {
@@ -49,12 +46,10 @@ export async function GET(req: NextRequest) {
   }
 
   const rawQ = req.nextUrl.searchParams.get('q')?.trim() ?? ''
-  // Enforce max query length and strip control characters to prevent API abuse
   const q = rawQ.replace(/[\x00-\x1F\x7F]/g, '').slice(0, 150)
   if (!q || q.length < 2) return NextResponse.json({ items: [] })
 
   try {
-    // 1. Search for videos (category 10 = Music)
     const searchUrl = new URL('https://www.googleapis.com/youtube/v3/search')
     searchUrl.searchParams.set('part', 'snippet')
     searchUrl.searchParams.set('type', 'video')
@@ -70,7 +65,6 @@ export async function GET(req: NextRequest) {
     const items = (searchData.items ?? []).filter((i) => i.id?.videoId)
     if (items.length === 0) return NextResponse.json({ items: [] })
 
-    // 2. Fetch durations via videos endpoint
     const ids = items.map((i) => i.id.videoId).join(',')
     const videosUrl = new URL('https://www.googleapis.com/youtube/v3/videos')
     videosUrl.searchParams.set('part', 'contentDetails')

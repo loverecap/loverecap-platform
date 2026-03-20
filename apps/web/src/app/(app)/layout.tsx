@@ -1,8 +1,6 @@
 import { redirect } from 'next/navigation'
 import { createRouteHandlerClient } from '@/lib/supabase/server'
 
-// Authenticated app layout — guards all (app) routes.
-// Redirects anonymous or unauthenticated users to /sign-in.
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createRouteHandlerClient()
   const {

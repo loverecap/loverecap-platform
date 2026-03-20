@@ -1,9 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
 import type { Database } from './database.types'
 
-// Service role client — bypasses RLS.
-// Use only in trusted server contexts (webhooks, admin jobs).
-// Never expose SUPABASE_SERVICE_ROLE_KEY to the browser.
 export function createAdminClient() {
   const url = process.env['NEXT_PUBLIC_SUPABASE_URL']
   const key = process.env['SUPABASE_SERVICE_ROLE_KEY']

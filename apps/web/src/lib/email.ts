@@ -37,10 +37,6 @@ export async function sendStoryReadyEmail({
   })
 }
 
-/**
- * Sent to anonymous users after payment — includes both the story link and a
- * "set up your password" CTA so they can access their account later.
- */
 export async function sendAccountSetupEmail({
   to,
   partnerName1,
@@ -108,8 +104,6 @@ export async function sendAccountSetupEmail({
     `,
   })
 }
-
-// ── Shared HTML helpers ──────────────────────────────────────────────────────
 
 function storyReadyHtml({
   partnerName1,

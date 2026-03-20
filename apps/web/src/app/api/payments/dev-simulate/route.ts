@@ -9,11 +9,6 @@ const schema = z.object({
   provider_payment_id: z.string().min(1),
 })
 
-// POST /api/payments/dev-simulate
-// Triggers AbacatePay's payment simulation endpoint.
-// ONLY available outside production — returns 403 in production.
-//
-// AbacatePay docs: POST /v1/pixQrCode/simulate-payment?id=<pixId>
 export async function POST(request: NextRequest) {
   const devToolsEnabled =
     process.env.NODE_ENV !== 'production' ||

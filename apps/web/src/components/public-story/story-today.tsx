@@ -8,11 +8,6 @@ interface StoryTodayProps {
   startDate: string
 }
 
-/**
- * "Hoje" section — connects past memories with the present.
- * Displays the live day counter with a soft glowing heart and a subtitle
- * that reinforces the ongoing nature of the story.
- */
 export function StoryToday({ startDate }: StoryTodayProps) {
   const reduce = useReducedMotion()
   const days = daysBetween(startDate)
@@ -26,7 +21,7 @@ export function StoryToday({ startDate }: StoryTodayProps) {
         background: 'linear-gradient(180deg, #FFF8F2 0%, #FFF0F3 40%, #FDF2F8 80%, #FFF8F2 100%)',
       }}
     >
-      {/* Soft radial glow */}
+      
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
@@ -36,7 +31,7 @@ export function StoryToday({ startDate }: StoryTodayProps) {
       />
 
       <div className="relative z-10 max-w-xs mx-auto">
-        {/* Section eyebrow */}
+        
         <motion.div
           initial={reduce ? {} : { opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -62,7 +57,6 @@ export function StoryToday({ startDate }: StoryTodayProps) {
           />
         </motion.div>
 
-        {/* Pulsing heart + day counter card */}
         <motion.div
           initial={reduce ? {} : { opacity: 0, scale: 0.88, y: 24 }}
           whileInView={{ opacity: 1, scale: 1, y: 0 }}
@@ -70,7 +64,7 @@ export function StoryToday({ startDate }: StoryTodayProps) {
           transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
           className="relative mx-auto w-fit"
         >
-          {/* Ambient glow ring */}
+          
           {!reduce && (
             <motion.div
               animate={{ scale: [1, 1.35, 1], opacity: [0.3, 0.08, 0.3] }}
@@ -80,7 +74,6 @@ export function StoryToday({ startDate }: StoryTodayProps) {
             />
           )}
 
-          {/* Card */}
           <div
             className="relative rounded-3xl px-10 py-8 border"
             style={{
@@ -90,7 +83,7 @@ export function StoryToday({ startDate }: StoryTodayProps) {
               boxShadow: '0 8px 32px rgba(255,77,109,0.10), 0 1px 4px rgba(0,0,0,0.04)',
             }}
           >
-            {/* Heart icon */}
+            
             <motion.div
               animate={reduce ? {} : { scale: [1, 1.12, 1] }}
               transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut' }}
@@ -103,7 +96,6 @@ export function StoryToday({ startDate }: StoryTodayProps) {
               <Heart className="h-5 w-5 fill-[#FF4D6D] text-[#FF4D6D]" />
             </motion.div>
 
-            {/* Day counter */}
             <p
               className="font-story font-bold text-[#2B2B2B] tabular-nums leading-none mb-1"
               style={{ fontSize: 'clamp(2.5rem, 10vw, 3.5rem)' }}
@@ -116,7 +108,6 @@ export function StoryToday({ startDate }: StoryTodayProps) {
           </div>
         </motion.div>
 
-        {/* Subtitle */}
         <motion.p
           initial={reduce ? {} : { opacity: 0, y: 12 }}
           whileInView={{ opacity: 1, y: 0 }}

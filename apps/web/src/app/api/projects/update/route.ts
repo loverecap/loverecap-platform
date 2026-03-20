@@ -11,9 +11,6 @@ import {
   serverError,
 } from '@/lib/api-response'
 
-// POST /api/projects/update
-// Updates mutable fields on an existing draft/processing project.
-// Ownership is enforced by passing user_id to the query (double-checked by RLS).
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createRouteHandlerClient()
@@ -26,7 +23,6 @@ export async function POST(request: NextRequest) {
 
     const { project_id, ...fields } = parsed.data
 
-    // Build only the fields that were actually provided
     const patch = Object.fromEntries(
       Object.entries(fields).filter(([, v]) => v !== undefined),
     )
@@ -37,7 +33,7 @@ export async function POST(request: NextRequest) {
 
     const project = await updateProject(supabase, project_id, user.id, patch).catch(
       (e: { code?: string }) => {
-        if (e?.code === 'PGRST116') return null // row not found
+        if (e?.code === 'PGRST116') return null
         throw e
       },
     )

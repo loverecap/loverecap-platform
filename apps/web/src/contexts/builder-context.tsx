@@ -38,12 +38,11 @@ export interface BuilderMemory {
 export interface UploadedPhoto {
   assetId: string
   storagePath: string
-  /** blob: URL — valid only during the current page session; empty string when restored from sessionStorage */
+  
   previewUrl: string
   name: string
 }
 
-// Alias for internal use
 type Memory = BuilderMemory
 
 interface BuilderState {
@@ -88,7 +87,6 @@ const initialState: BuilderState = {
   error: null,
 }
 
-// Fields that are safe to persist — excludes ephemeral UI state
 type PersistedState = Pick<BuilderState, 'projectId' | 'info' | 'memories' | 'uploadedPhotos' | 'finalMessage'>
 
 const STORAGE_KEY = 'loverecap:builder'
@@ -111,7 +109,6 @@ function writePersistedState(state: BuilderState) {
       projectId: state.projectId,
       info: state.info,
       memories: state.memories,
-      // Strip blob: previewUrls — they're only valid in the current page session
       uploadedPhotos: state.uploadedPhotos.map(({ previewUrl: _, ...rest }) => ({
         ...rest,
         previewUrl: '',
@@ -120,7 +117,6 @@ function writePersistedState(state: BuilderState) {
     }
     sessionStorage.setItem(STORAGE_KEY, JSON.stringify(persisted))
   } catch {
-    // sessionStorage unavailable (e.g. private browsing quota) — fail silently
   }
 }
 
@@ -150,7 +146,7 @@ function builderReducer(state: BuilderState, action: BuilderAction): BuilderStat
       return { ...state, ...action.payload }
     case 'RESET':
       if (typeof window !== 'undefined') {
-        try { sessionStorage.removeItem(STORAGE_KEY) } catch { /* ignore */ }
+        try { sessionStorage.removeItem(STORAGE_KEY) } catch {  }
       }
       return { ...initialState }
     default:
@@ -171,7 +167,6 @@ const BuilderContext = createContext<BuilderContextValue | null>(null)
 export function BuilderProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(builderReducer, initialState)
 
-  // Hydrate from sessionStorage on first render (client-only)
   useEffect(() => {
     const saved = readPersistedState()
     if (saved.projectId ?? saved.info ?? saved.memories?.length ?? saved.uploadedPhotos?.length) {
@@ -180,7 +175,6 @@ export function BuilderProvider({ children }: { children: React.ReactNode }) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  // Persist relevant state whenever it changes
   useEffect(() => {
     writePersistedState(state)
   }, [state])

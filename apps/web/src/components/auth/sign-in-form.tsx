@@ -13,8 +13,6 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 
-// ── Schemas ────────────────────────────────────────────────────────────────
-
 const magicLinkSchema = z.object({
   email: z.string().email('Digite um e-mail válido'),
 })
@@ -28,8 +26,6 @@ type MagicLinkValues = z.infer<typeof magicLinkSchema>
 type PasswordValues = z.infer<typeof passwordSchema>
 type Tab = 'magic' | 'password'
 type PasswordMode = 'signin' | 'signup'
-
-// ── Sub-components ─────────────────────────────────────────────────────────
 
 function MagicLinkTab({ redirectTo }: { redirectTo?: string | undefined }) {
   const [sent, setSent] = useState(false)
@@ -167,7 +163,6 @@ function PasswordTab({ redirectTo }: { redirectTo?: string | undefined }) {
       return
     }
 
-    // Successful sign-in: go to callback for smart redirect
     router.push('/auth/callback?source=password')
   }
 
@@ -251,14 +246,12 @@ function PasswordTab({ redirectTo }: { redirectTo?: string | undefined }) {
   )
 }
 
-// ── Main component ─────────────────────────────────────────────────────────
-
 export function SignInForm({ redirectTo }: { redirectTo?: string | undefined }) {
   const [tab, setTab] = useState<Tab>('magic')
 
   return (
     <div className="w-full max-w-sm">
-      {/* Heading */}
+      
       <div className="mb-8 text-center">
         <h2 className="font-heading text-2xl font-bold text-neutral-900 mb-1">
           Bem-vindo de volta
@@ -268,7 +261,6 @@ export function SignInForm({ redirectTo }: { redirectTo?: string | undefined }) 
         </p>
       </div>
 
-      {/* Tabs */}
       <div className="flex border-b border-neutral-200 mb-6">
         {([
           { id: 'magic', label: 'Link mágico' },
@@ -293,7 +285,6 @@ export function SignInForm({ redirectTo }: { redirectTo?: string | undefined }) 
         ))}
       </div>
 
-      {/* Tab content */}
       <AnimatePresence mode="wait" initial={false}>
         <motion.div
           key={tab}

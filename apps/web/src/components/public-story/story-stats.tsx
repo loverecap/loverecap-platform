@@ -41,18 +41,16 @@ function StatCard({ icon, value, label, delay, accent }: StatCardProps) {
         boxShadow: '0 4px 20px rgba(255,77,109,0.18), 0 1px 4px rgba(0,0,0,0.06)',
       }}
     >
-      {/* Subtle noise texture overlay for depth */}
+      
       <div
         className="absolute inset-0 pointer-events-none rounded-2xl"
         style={{ opacity: 0.04, backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 200 200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'n\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.9\' numOctaves=\'4\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23n)\'/%3E%3C/svg%3E")' }}
       />
 
-      {/* Icon */}
       <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/20">
         {icon}
       </div>
 
-      {/* Value */}
       <p
         className="font-story font-bold text-white leading-none tabular-nums"
         style={{ fontSize: 'clamp(1.75rem, 8vw, 2.5rem)' }}
@@ -60,7 +58,6 @@ function StatCard({ icon, value, label, delay, accent }: StatCardProps) {
         {value}
       </p>
 
-      {/* Label */}
       <p className="text-xs font-semibold uppercase tracking-[0.14em] text-white/75 leading-tight">
         {label}
       </p>
@@ -68,11 +65,6 @@ function StatCard({ icon, value, label, delay, accent }: StatCardProps) {
   )
 }
 
-/**
- * "Estatísticas do Amor" — shareable stats section.
- * Designed to look great in a screenshot (Spotify Wrapped aesthetic):
- * high-contrast gradient cards, large numbers, minimal text.
- */
 export function StoryStats({ startDate, memoriesCount, musicTrack, photosCount }: StoryStatsProps) {
   const reduce = useReducedMotion()
   const days = daysBetween(startDate)
@@ -124,7 +116,7 @@ export function StoryStats({ startDate, memoriesCount, musicTrack, photosCount }
         background: 'linear-gradient(180deg, #FFF8F2 0%, #F5E9E2 50%, #FFF8F2 100%)',
       }}
     >
-      {/* Background ambient blobs */}
+      
       <div
         className="absolute -top-20 -left-20 h-64 w-64 rounded-full pointer-events-none"
         style={{
@@ -141,7 +133,7 @@ export function StoryStats({ startDate, memoriesCount, musicTrack, photosCount }
       />
 
       <div className="relative z-10 max-w-xs mx-auto">
-        {/* Section header */}
+        
         <motion.div
           initial={reduce ? {} : { opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -167,7 +159,6 @@ export function StoryStats({ startDate, memoriesCount, musicTrack, photosCount }
           />
         </motion.div>
 
-        {/* Stats grid */}
         <div
           className={
             stats.length >= 4

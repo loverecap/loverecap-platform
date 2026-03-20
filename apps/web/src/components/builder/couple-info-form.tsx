@@ -46,7 +46,6 @@ export function CoupleInfoForm() {
     try {
       const title = `${values.partner_name_1} & ${values.partner_name_2}`
 
-      // If a project already exists (user went back), update it instead of creating a new one
       if (state.projectId) {
         const res = await fetch('/api/projects/update', {
           method: 'POST',

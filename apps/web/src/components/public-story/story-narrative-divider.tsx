@@ -4,15 +4,10 @@ import { motion, useReducedMotion } from 'framer-motion'
 
 interface StoryNarrativeDividerProps {
   text: string
-  /** Visual accent variant. Defaults to 'default'. */
+  
   variant?: 'default' | 'dark'
 }
 
-/**
- * Emotional storytelling bridge between sections.
- * Renders a centered, italic sentence with flanking ornamental lines and a
- * scroll-triggered fade-in. Inspired by editorial chapter breaks.
- */
 export function StoryNarrativeDivider({ text, variant = 'default' }: StoryNarrativeDividerProps) {
   const reduce = useReducedMotion()
   const isDark = variant === 'dark'
@@ -26,7 +21,7 @@ export function StoryNarrativeDivider({ text, variant = 'default' }: StoryNarrat
       className="px-8 py-10 text-center"
       aria-hidden="true"
     >
-      {/* Ornamental top line */}
+      
       <div className="flex items-center justify-center gap-3 mb-5">
         <div
           className="h-px w-10 rounded-full"
@@ -50,7 +45,6 @@ export function StoryNarrativeDivider({ text, variant = 'default' }: StoryNarrat
         />
       </div>
 
-      {/* Sentence */}
       <p
         className="font-story italic leading-relaxed max-w-xs mx-auto"
         style={{

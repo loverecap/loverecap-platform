@@ -1,16 +1,16 @@
 import type { ZodiacSign } from './zodiac-utils'
 
 export interface StarPoint {
-  x: number    // 0–1 normalized (scales to SVG width)
-  y: number    // 0–1 normalized (scales to SVG height)
-  size: number // visual magnitude (1.5–3.5)
+  x: number
+  y: number
+  size: number
   name?: string
 }
 
 export interface ConstellationData {
   sign: ZodiacSign
   stars: StarPoint[]
-  connections: Array<[number, number]> // pairs of star indices
+  connections: Array<[number, number]>
 }
 
 const constellations: ConstellationData[] = [

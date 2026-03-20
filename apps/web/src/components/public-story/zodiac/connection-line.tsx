@@ -17,8 +17,6 @@ export function ConnectionLine({ x1, y1, x2, y2, delay, revealed }: ConnectionLi
   const pathRef = useRef<SVGLineElement>(null)
   const length = Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
 
-  // We use stroke-dashoffset animation via Framer Motion
-  // Framer handles the SVG attribute animation directly
   return (
     <motion.line
       ref={pathRef}

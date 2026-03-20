@@ -22,10 +22,6 @@ import { rateLimit } from '@/lib/rate-limit'
 
 const PUBLISHABLE_STATUSES = ['draft', 'paid'] as const
 
-// POST /api/projects/publish
-// Transitions a project to "published" and makes it accessible via /story/[slug].
-// Requirements: project must be owned by the caller and have at least one memory.
-// Rate limit: 10 publish attempts per user per hour.
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createRouteHandlerClient()
@@ -43,7 +39,6 @@ export async function POST(request: NextRequest) {
 
     const { project_id } = parsed.data
 
-    // Load project — RLS ensures only the owner can see it
     const project = await getProjectById(supabase, project_id).catch(
       (e: { code?: string }) => {
         if (e?.code === 'PGRST116') return null
@@ -62,16 +57,13 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Must have at least one memory
     const memories = await getMemoriesByProject(supabase, project_id)
     if (memories.length === 0) {
       return err('Add at least one memory before publishing', 422, 'NO_MEMORIES')
     }
 
-    // Slug is already set at creation — re-use it
     const published = await publishProject(supabase, project_id, user.id, project.slug)
 
-    // Fire-and-forget analytics
     const admin = createAdminClient()
     void logEvent(admin, 'project.published', {
       projectId: published.id,

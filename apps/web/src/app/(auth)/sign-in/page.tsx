@@ -19,7 +19,6 @@ export default async function SignInPage({
     data: { user },
   } = await supabase.auth.getUser()
 
-  // Redirect already-authenticated non-anonymous users
   if (user && !user.is_anonymous) {
     redirect('/dashboard')
   }

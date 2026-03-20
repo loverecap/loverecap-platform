@@ -12,7 +12,6 @@ import {
   serverError,
 } from '@/lib/api-response'
 
-// PATCH /api/memories/update
 export async function PATCH(request: NextRequest) {
   try {
     const supabase = await createRouteHandlerClient()

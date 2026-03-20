@@ -20,13 +20,12 @@ import {
 const schema = z.object({
   project_id: z.string().uuid(),
   email: z.string().email(),
-  /** CPF — accepts both formatted (000.000.000-00) and raw (00000000000) */
+  
   tax_id: z.string().min(11).max(18),
-  /** Celular — accepts (11) 99999-9999 or 11999999999 */
+  
   cellphone: z.string().min(10).max(20),
 })
 
-/** R$ 9,99 — single price for MVP */
 const PRICE_CENTS = 999
 
 export async function POST(request: NextRequest) {
@@ -36,7 +35,6 @@ export async function POST(request: NextRequest) {
   const user = await requireUser(supabase).catch(() => null)
   if (!user) return unauthorizedError()
 
-  // 5 payment attempts per user per hour — prevents abuse of external API quota
   const rl = rateLimit(`pix:${user.id}`, 5, 60 * 60 * 1000)
   if (!rl.success) {
     log.warn('Rate limit exceeded', { userId: user.id })
@@ -49,13 +47,11 @@ export async function POST(request: NextRequest) {
     if (!parsed.success) return validationError(parsed.error)
 
     const { project_id, email } = parsed.data
-    // Strip non-digit characters — AbacatePay expects raw digits only
     const tax_id = parsed.data.tax_id.replace(/\D/g, '')
     const cellphone = parsed.data.cellphone.replace(/\D/g, '')
 
     log.info('PIX charge requested', { userId: user.id, projectId: project_id })
 
-    // Verify project ownership via RLS-protected client
     const project = await getProjectById(supabase, project_id).catch(
       (e: { code?: string }) => {
         if (e?.code === 'PGRST116') return null
@@ -74,7 +70,6 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Create PIX charge with AbacatePay
     const charge = await createPixCharge(env.abacatePayApiKey(), {
       amount: PRICE_CENTS,
       description: 'LoveRecap — acesso vitalício',
@@ -92,8 +87,6 @@ export async function POST(request: NextRequest) {
 
     log.info('PIX charge created', { chargeId: charge.id, projectId: project_id })
 
-    // Use admin client — payments table has no INSERT RLS policy (anonymous users have role 'anon').
-    // Ownership is already verified above via the RLS-protected project query.
     const admin = createAdminClient()
     const payment = await createPayment(admin, {
       project_id,
@@ -106,7 +99,6 @@ export async function POST(request: NextRequest) {
       metadata: { customer_email: email },
     })
 
-    // Fire-and-forget audit trail
     void logEvent(admin, 'payment.pix.created', {
       projectId: project_id,
       userId: user.id,
@@ -116,7 +108,7 @@ export async function POST(request: NextRequest) {
     return ok({
       paymentId: payment.id,
       providerPaymentId: charge.id,
-      /** <img src={qrCodeImage} /> — ready to render directly */
+      
       qrCodeImage: `data:image/png;base64,${charge.brCodeBase64}`,
       brCode: charge.brCode,
       expiresAt: charge.expiresAt,

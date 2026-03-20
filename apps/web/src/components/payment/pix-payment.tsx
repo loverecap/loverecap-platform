@@ -10,7 +10,6 @@ import { createSupabaseBrowserClient } from '@/lib/supabase/client'
 
 type Step = 'form' | 'loading' | 'polling' | 'paid' | 'expired' | 'error'
 
-/** CPF mask: 000.000.000-00 | CNPJ mask: 00.000.000/0000-00 */
 function maskTaxId(value: string): string {
   const d = value.replace(/\D/g, '').slice(0, 14)
   if (d.length <= 11) {
@@ -19,7 +18,6 @@ function maskTaxId(value: string): string {
     if (d.length <= 9) return `${d.slice(0, 3)}.${d.slice(3, 6)}.${d.slice(6)}`
     return `${d.slice(0, 3)}.${d.slice(3, 6)}.${d.slice(6, 9)}-${d.slice(9)}`
   }
-  // CNPJ
   if (d.length <= 2) return d
   if (d.length <= 5) return `${d.slice(0, 2)}.${d.slice(2)}`
   if (d.length <= 8) return `${d.slice(0, 2)}.${d.slice(2, 5)}.${d.slice(5)}`
@@ -86,7 +84,7 @@ const IS_DEV = process.env.NODE_ENV === 'development' || process.env['NEXT_PUBLI
 
 interface PixData {
   paymentId: string
-  /** provider_payment_id from AbacatePay — needed for dev simulation */
+  
   providerPaymentId: string
   qrCodeImage: string
   brCode: string
@@ -114,7 +112,6 @@ export function PixPayment({ projectId, onSuccess }: PixPaymentProps) {
   const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
-  // Auto-fill email for authenticated (non-anonymous) users
   useEffect(() => {
     const supabase = createSupabaseBrowserClient()
     void supabase.auth.getUser().then(({ data }) => {
@@ -186,7 +183,6 @@ export function PixPayment({ projectId, onSuccess }: PixPaymentProps) {
           setStep('expired')
         }
       } catch {
-        // Transient network error — retry on next tick
       }
     }, 5000)
   }
@@ -221,7 +217,6 @@ export function PixPayment({ projectId, onSuccess }: PixPaymentProps) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ provider_payment_id: pixData.providerPaymentId }),
     })
-    // Polling will pick up the PAID status on the next tick
   }
 
   function handleRetry() {
@@ -239,7 +234,6 @@ export function PixPayment({ projectId, onSuccess }: PixPaymentProps) {
     return `${m}:${String(s).padStart(2, '0')}`
   }
 
-  // ── Form ────────────────────────────────────────────────────────────────
   if (step === 'form' || step === 'error') {
     return (
       <div className="space-y-4">
@@ -315,7 +309,6 @@ export function PixPayment({ projectId, onSuccess }: PixPaymentProps) {
     )
   }
 
-  // ── Loading ─────────────────────────────────────────────────────────────
   if (step === 'loading') {
     return (
       <div className="flex flex-col items-center gap-3 py-10">
@@ -325,7 +318,6 @@ export function PixPayment({ projectId, onSuccess }: PixPaymentProps) {
     )
   }
 
-  // ── QR Code (polling) ───────────────────────────────────────────────────
   if (step === 'polling' && pixData) {
     return (
       <div className="space-y-4">
@@ -388,7 +380,6 @@ export function PixPayment({ projectId, onSuccess }: PixPaymentProps) {
     )
   }
 
-  // ── Paid ────────────────────────────────────────────────────────────────
   if (step === 'paid') {
     return (
       <div className="flex flex-col items-center gap-3 py-10 text-center">
@@ -402,7 +393,6 @@ export function PixPayment({ projectId, onSuccess }: PixPaymentProps) {
     )
   }
 
-  // ── Expired ─────────────────────────────────────────────────────────────
   if (step === 'expired') {
     return (
       <div className="space-y-4 py-4 text-center">

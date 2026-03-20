@@ -7,10 +7,6 @@ export type Memory = Tables<'memories'>
 export type MemoryInsert = TablesInsert<'memories'>
 export type MemoryUpdate = TablesUpdate<'memories'>
 
-// ──────────────────────────────────────────────
-// Read
-// ──────────────────────────────────────────────
-
 export async function getMemoriesByProject(client: DBClient, projectId: string) {
   const { data, error } = await client
     .from('memories')
@@ -32,10 +28,6 @@ export async function getMemoryById(client: DBClient, id: string) {
   if (error) throw error
   return data
 }
-
-// ──────────────────────────────────────────────
-// Write
-// ──────────────────────────────────────────────
 
 export async function createMemory(client: DBClient, payload: MemoryInsert) {
   const { data, error } = await client
@@ -69,7 +61,6 @@ export async function deleteMemory(client: DBClient, id: string) {
   if (error) throw error
 }
 
-// Reorders memories by updating each row's position.
 export async function reorderMemories(
   client: DBClient,
   updates: { id: string; position: number }[],

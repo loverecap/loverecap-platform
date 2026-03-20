@@ -29,7 +29,6 @@ import { useBuilder } from '@/contexts/builder-context'
 import type { BuilderMemory } from '@/contexts/builder-context'
 import { cn } from '@loverecap/utils'
 
-// Bug 1 fix: split on spaces instead of \b\w — handles accented chars (ã, é, ç…) correctly
 const toTitleCase = (str: string) =>
   str.split(' ').map((w) => (w ? w.charAt(0).toUpperCase() + w.slice(1) : '')).join(' ')
 const toSentenceCase = (str: string) => (str ? str.charAt(0).toUpperCase() + str.slice(1) : str)
@@ -64,7 +63,6 @@ export function TimelineForm() {
   const [dropTargetIndex, setDropTargetIndex] = useState<number | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  // Bug 2 fix: reset file input when window regains focus (Android back button dismisses picker)
   useEffect(() => {
     const handleFocus = () => {
       if (fileInputRef.current) fileInputRef.current.value = ''
@@ -86,7 +84,6 @@ export function TimelineForm() {
     setIsAdding(true)
   }
 
-  // Bug 3: pre-populate form to edit an existing memory
   function startEditing(memory: BuilderMemory) {
     setEditingId(memory.id)
     form.reset({
@@ -107,7 +104,6 @@ export function TimelineForm() {
     form.reset()
   }
 
-  // ── Photo file handling ──────────────────────────────────────────────────
   function handlePhotoFile(file: File) {
     if (!ALLOWED_TYPES.includes(file.type)) {
       toast.error('Apenas imagens JPG, PNG e WebP são permitidas.')
@@ -134,7 +130,6 @@ export function TimelineForm() {
     if (file) handlePhotoFile(file)
   }
 
-  // ── Bug 4: Drag-to-reorder ───────────────────────────────────────────────
   function handleDragStart(e: React.DragEvent, index: number) {
     e.dataTransfer.effectAllowed = 'move'
     setDragIndex(index)
@@ -147,7 +142,6 @@ export function TimelineForm() {
   }
 
   function handleDragLeave(e: React.DragEvent) {
-    // Only clear if actually leaving the element (not entering a child)
     if (!(e.currentTarget as HTMLElement).contains(e.relatedTarget as Node)) {
       setDropTargetIndex(null)
     }
@@ -186,7 +180,6 @@ export function TimelineForm() {
     }
   }
 
-  // ── Submit ───────────────────────────────────────────────────────────────
   async function onSubmit(values: MemoryFormValues) {
     if (editingId) {
       await onUpdateMemory(values)
@@ -195,7 +188,6 @@ export function TimelineForm() {
     }
   }
 
-  // Bug 3: update existing memory
   async function onUpdateMemory(values: MemoryFormValues) {
     if (!editingId) return
     setIsSaving(true)
@@ -338,7 +330,6 @@ export function TimelineForm() {
         </p>
       </div>
 
-      {/* Memory list with drag-to-reorder */}
       {state.memories.length > 0 && (
         <div className="space-y-2">
           {state.memories.map((memory, i) => (
@@ -355,7 +346,7 @@ export function TimelineForm() {
                   : 'border-neutral-200',
               )}
             >
-              {/* Drag handle — only this element is draggable */}
+              
               <div
                 draggable
                 onDragStart={(e) => handleDragStart(e, i)}
@@ -387,7 +378,6 @@ export function TimelineForm() {
                 )}
               </div>
 
-              {/* Edit button */}
               <button
                 onClick={() => startEditing(memory)}
                 className="shrink-0 text-neutral-300 hover:text-[#FF4D6D] transition-colors"
@@ -396,7 +386,6 @@ export function TimelineForm() {
                 <Pencil className="h-4 w-4" />
               </button>
 
-              {/* Delete button */}
               <button
                 onClick={() => dispatch({ type: 'REMOVE_MEMORY', payload: memory.id })}
                 className="shrink-0 text-neutral-300 hover:text-red-400 transition-colors"
@@ -409,7 +398,6 @@ export function TimelineForm() {
         </div>
       )}
 
-      {/* Add / Edit form */}
       {isAdding ? (
         <div className="rounded-xl border border-[#FF4D6D]/30 bg-[#FFF0F3]/40 p-5">
           <h2 className="font-heading text-base font-semibold text-neutral-900 mb-5">
@@ -418,7 +406,6 @@ export function TimelineForm() {
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
 
-              {/* ── Ícone (obrigatório) ──────────────────────────────────── */}
               <FormField
                 control={form.control}
                 name="emoji"
@@ -466,7 +453,6 @@ export function TimelineForm() {
                 )}
               />
 
-              {/* ── Foto do momento (only on new memory) ────────────────── */}
               {!editingId && (
                 <div>
                   <p className="mb-2 text-sm font-medium text-neutral-700">
@@ -534,7 +520,6 @@ export function TimelineForm() {
                 </div>
               )}
 
-              {/* ── Título + Data ─────────────────────────────────────────── */}
               <div className="grid gap-4 sm:grid-cols-2">
                 <FormField
                   control={form.control}
@@ -584,7 +569,6 @@ export function TimelineForm() {
                 />
               </div>
 
-              {/* ── Frase do cartão ──────────────────────────────────────── */}
               <FormField
                 control={form.control}
                 name="short_description"
@@ -619,7 +603,6 @@ export function TimelineForm() {
                 )}
               />
 
-              {/* ── Descrição completa ───────────────────────────────────── */}
               <FormField
                 control={form.control}
                 name="description"

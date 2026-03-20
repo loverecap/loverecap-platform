@@ -31,7 +31,6 @@ type RawMusic = {
   video_id: string | null
   thumbnail_url: string | null
   duration: string | null
-  // Legacy
   storage_path: string | null
   external_url: string | null
 }
@@ -90,12 +89,6 @@ export async function generateMetadata({ params }: StoryPageProps): Promise<Meta
 export default async function StoryPage({ params }: StoryPageProps) {
   const { slug } = await params
 
-  // Use the admin client (service role) for all data fetching on the public story page.
-  // The `assets` table has an RLS policy that restricts reads to the project owner.
-  // Unauthenticated visitors have no session → auth.uid() = null → RLS returns an
-  // empty assets array → StoryGallery receives photos.length === 0 → section disappears.
-  // The admin client bypasses RLS so any visitor sees the full story. This is safe
-  // because only published projects are accessible here (slug is only created after payment).
   const admin = createAdminClient()
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -107,9 +100,8 @@ export default async function StoryPage({ params }: StoryPageProps) {
 
   if (!project) return notFound()
 
-  const SIGNED_URL_EXPIRY = 60 * 60 * 24 * 365 // 1 year
+  const SIGNED_URL_EXPIRY = 60 * 60 * 24 * 365
 
-  // ── Assets (photos / videos) ────────────────────────────────────
   const assetsWithUrls = await Promise.all(
     ((project.assets ?? []) as RawAsset[]).map(async (asset) => {
       const { data } = await admin.storage
@@ -140,9 +132,6 @@ export default async function StoryPage({ params }: StoryPageProps) {
     (a, b) => a.position - b.position,
   )
 
-  // ── New feature tables — queried separately so the app works even
-  //    before the migration has been pushed to the remote database.
-  // ── Music ────────────────────────────────────────────────────────
   let musicProp: {
     provider: 'youtube' | 'file' | 'external_url'
     trackTitle: string
@@ -173,7 +162,6 @@ export default async function StoryPage({ params }: StoryPageProps) {
           thumbnail: musicRow.thumbnail_url,
         }
       } else {
-        // Legacy: resolve audio URL from storage or external
         let audioUrl = musicRow.external_url ?? ''
         if (!audioUrl && musicRow.storage_path) {
           const { data } = await admin.storage
@@ -192,10 +180,8 @@ export default async function StoryPage({ params }: StoryPageProps) {
       }
     }
   } catch {
-    // Table may not exist yet — fail silently
   }
 
-  // ── Hidden surprises ─────────────────────────────────────────────
   let hiddenSurprises: { id: string; memory_id: string | null; message: string; emoji: string; position: number }[] = []
   try {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -213,10 +199,8 @@ export default async function StoryPage({ params }: StoryPageProps) {
       position: s.position,
     }))
   } catch {
-    // Table may not exist yet — fail silently
   }
 
-  // ── Future message ───────────────────────────────────────────────
   let futureProp: { message: string; revealAt: string; hintText?: string | null } | null = null
   try {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -235,7 +219,6 @@ export default async function StoryPage({ params }: StoryPageProps) {
       }
     }
   } catch {
-    // Table may not exist yet — fail silently
   }
 
   const appUrl = process.env['NEXT_PUBLIC_APP_URL'] ?? 'https://loverecap.app'

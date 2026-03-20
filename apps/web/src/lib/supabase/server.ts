@@ -2,9 +2,6 @@ import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import type { Database } from '@loverecap/database'
 
-// User-scoped Supabase client for Route Handlers and Server Components.
-// Respects RLS — the signed-in user's session drives all queries.
-// Call this inside an async function so cookies() can read the request.
 export async function createRouteHandlerClient() {
   const cookieStore = await cookies()
 

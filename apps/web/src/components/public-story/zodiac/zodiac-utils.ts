@@ -1,5 +1,3 @@
-// Pure JS zodiac sign calculator — no external packages
-// Uses date-range lookup table (solar/tropical zodiac)
 
 export type ZodiacSign =
   | 'Aries' | 'Taurus' | 'Gemini' | 'Cancer' | 'Leo' | 'Virgo'
@@ -21,7 +19,6 @@ interface SignEntry {
   element_emoji: string
   tagline: string
   emoji: string
-  // month/day range: from startMonth/startDay to endMonth/endDay (inclusive)
   startMonth: number
   startDay: number
   endMonth: number
@@ -93,11 +90,10 @@ const SIGNS: SignEntry[] = [
 
 export function getZodiacSign(dateStr: string): ZodiacResult {
   const d = new Date(dateStr + 'T12:00:00Z')
-  const month = d.getUTCMonth() + 1 // 1–12
+  const month = d.getUTCMonth() + 1
   const day = d.getUTCDate()
 
   for (const entry of SIGNS) {
-    // Handle Capricorn (spans year boundary: Dec 22 – Jan 19)
     if (entry.sign === 'Capricorn') {
       if ((month === 12 && day >= 22) || (month === 1 && day <= 19)) {
         return { sign: entry.sign, name_pt: entry.name_pt, element: entry.element, element_emoji: entry.element_emoji, tagline: entry.tagline, emoji: entry.emoji }
@@ -112,7 +108,6 @@ export function getZodiacSign(dateStr: string): ZodiacResult {
     }
   }
 
-  // Fallback (should never hit)
   const fallback = SIGNS[0]!
   return { sign: fallback.sign, name_pt: fallback.name_pt, element: fallback.element, element_emoji: fallback.element_emoji, tagline: fallback.tagline, emoji: fallback.emoji }
 }

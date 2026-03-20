@@ -37,7 +37,6 @@ interface StoryTimelineProps {
   hiddenSurprises?: HiddenSurprise[]
 }
 
-// Soft gradient palettes for photo-less cards — cycles through these
 const CARD_GRADIENTS = [
   'linear-gradient(135deg, #FFB0C8 0%, #FF4D6D 100%)',
   'linear-gradient(135deg, #F8C8DC 0%, #E89AAE 100%)',
@@ -64,7 +63,7 @@ export function StoryTimeline({ memories, hiddenSurprises = [] }: StoryTimelineP
       className="py-20"
       style={{ background: 'linear-gradient(180deg, #FFF8F2 0%, #F5E9E2 50%, #FFF8F2 100%)' }}
     >
-      {/* Section header */}
+      
       <motion.div
         initial={reduce ? {} : { opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -87,7 +86,6 @@ export function StoryTimeline({ memories, hiddenSurprises = [] }: StoryTimelineP
         />
       </motion.div>
 
-      {/* Cards grid — vertical storyline */}
       <div className="px-4 max-w-lg mx-auto space-y-4">
         {memories.map((memory, i) => {
           const photo = memory.assets?.find((a) => a.asset_type === 'image')
@@ -116,7 +114,7 @@ export function StoryTimeline({ memories, hiddenSurprises = [] }: StoryTimelineP
                 }}
               >
                 {photo ? (
-                  /* ── Photo card ─────────────────────────────────────── */
+                  
                   <>
                     <Image
                       src={photo.url}
@@ -125,7 +123,7 @@ export function StoryTimeline({ memories, hiddenSurprises = [] }: StoryTimelineP
                       className="object-cover"
                       sizes="(max-width: 640px) calc(100vw - 32px), 560px"
                     />
-                    {/* Multi-stop gradient overlay — heavy at bottom for text legibility */}
+                    
                     <div
                       className="absolute inset-0 pointer-events-none"
                       style={{
@@ -135,7 +133,7 @@ export function StoryTimeline({ memories, hiddenSurprises = [] }: StoryTimelineP
                     />
                   </>
                 ) : (
-                  /* ── Typographic card (no photo) ─────────────────── */
+                  
                   <>
                     <div className="absolute inset-0" style={{ background: gradient }} />
                     <div
@@ -145,7 +143,7 @@ export function StoryTimeline({ memories, hiddenSurprises = [] }: StoryTimelineP
                           'linear-gradient(to top, rgba(0,0,0,0.40) 0%, rgba(0,0,0,0.08) 60%, rgba(0,0,0,0) 100%)',
                       }}
                     />
-                    {/* Centered emoji for no-photo cards */}
+                    
                     {memory.emoji && (
                       <div className="absolute inset-0 flex items-center justify-center pb-16">
                         <motion.span
@@ -163,9 +161,8 @@ export function StoryTimeline({ memories, hiddenSurprises = [] }: StoryTimelineP
                   </>
                 )}
 
-                {/* ── Text overlay (bottom of every card) ───────────── */}
                 <div className="absolute inset-x-0 bottom-0 px-5 pb-5 pt-8">
-                  {/* Memory index + date row */}
+                  
                   <div className="flex items-center gap-2 mb-2">
                     <span className="text-[10px] font-bold text-white/60 tabular-nums">
                       {String(i + 1).padStart(2, '0')}
@@ -185,12 +182,10 @@ export function StoryTimeline({ memories, hiddenSurprises = [] }: StoryTimelineP
                     )}
                   </div>
 
-                  {/* Title */}
                   <h3 className="font-story text-xl font-bold text-white leading-snug mb-1 drop-shadow-sm">
                     {memory.title}
                   </h3>
 
-                  {/* Preview text — short_description preferred, falls back to description */}
                   {previewText && (
                     <p className="text-sm text-white/75 leading-relaxed line-clamp-1">
                       {previewText}
@@ -198,7 +193,6 @@ export function StoryTimeline({ memories, hiddenSurprises = [] }: StoryTimelineP
                   )}
                 </div>
 
-                {/* Entrance shimmer effect */}
                 {!reduce && (
                   <motion.div
                     className="absolute inset-0 pointer-events-none"
@@ -214,7 +208,6 @@ export function StoryTimeline({ memories, hiddenSurprises = [] }: StoryTimelineP
                 )}
               </motion.article>
 
-              {/* Hidden surprise pin for this memory */}
               {surprise && (
                 <motion.div
                   initial={reduce ? {} : { opacity: 0, y: 12 }}
@@ -230,7 +223,6 @@ export function StoryTimeline({ memories, hiddenSurprises = [] }: StoryTimelineP
           )
         })}
 
-        {/* Orphan surprises */}
         {orphanSurprises.map((surprise) => (
           <motion.div
             key={surprise.id}
@@ -245,7 +237,6 @@ export function StoryTimeline({ memories, hiddenSurprises = [] }: StoryTimelineP
         ))}
       </div>
 
-      {/* Memory detail modal */}
       <MemoryModal
         memory={activeMemory ? {
           ...activeMemory,

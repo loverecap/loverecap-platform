@@ -1,25 +1,19 @@
-/**
- * AbacatePay PIX integration — server-side only.
- * Never import this module from client components.
- *
- * Docs: https://abacatepay.com/docs
- */
 
 const BASE_URL = 'https://api.abacatepay.com'
 
 export type PixStatus = 'PENDING' | 'PAID' | 'EXPIRED' | 'CANCELLED'
 
 export interface CreatePixParams {
-  /** Amount in cents (e.g. 999 = R$ 9,99) */
+  
   amount: number
-  /** Seconds until expiry — default 3600 (1 hour) */
+  
   expiresIn?: number
   description: string
   customer: {
     name: string
     email: string
     cellphone: string
-    /** CPF: 123.456.789-01 */
+    
     taxId: string
   }
   metadata?: Record<string, string>
@@ -27,9 +21,9 @@ export interface CreatePixParams {
 
 export interface PixCharge {
   id: string
-  /** Raw PIX copia-e-cola string */
+  
   brCode: string
-  /** Base64-encoded QR code image */
+  
   brCodeBase64: string
   expiresAt: string
   status: PixStatus
@@ -72,7 +66,6 @@ export async function checkPixStatus(
 
   const res = await fetch(url.toString(), {
     headers: { Authorization: `Bearer ${apiKey}` },
-    // Never cache status checks
     cache: 'no-store',
   })
 

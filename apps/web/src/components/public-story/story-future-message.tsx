@@ -6,7 +6,7 @@ import { Lock, Unlock } from 'lucide-react'
 
 interface StoryFutureMessageProps {
   message: string
-  revealAt: string   // ISO timestamp (UTC)
+  revealAt: string
   hintText?: string | null | undefined
 }
 
@@ -91,12 +91,12 @@ export function StoryFutureMessage({ message, revealAt, hintText }: StoryFutureM
       className="relative px-5 py-24 overflow-hidden"
       style={{ background: 'linear-gradient(180deg, #FFF8F2 0%, #F5E9E2 40%, #FFF0F3 70%, #FFF8F2 100%)' }}
     >
-      {/* Subtle background blobs */}
+      
       <div className="absolute top-0 right-0 w-64 h-64 rounded-full bg-[#F8C8DC]/25 -translate-y-1/3 translate-x-1/4 blur-3xl pointer-events-none" />
       <div className="absolute bottom-0 left-0 w-64 h-64 rounded-full bg-[#C8B6E2]/15 translate-y-1/3 -translate-x-1/4 blur-3xl pointer-events-none" />
 
       <div className="relative max-w-md mx-auto text-center">
-        {/* Section label */}
+        
         <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-[#C8B6E2] mb-3">
           ✦ Mensagem do futuro ✦
         </p>
@@ -105,7 +105,7 @@ export function StoryFutureMessage({ message, revealAt, hintText }: StoryFutureM
         </h2>
 
         <AnimatePresence mode="wait">
-          {/* ── LOCKED STATE ── */}
+          
           {!unlocked && (
             <motion.div
               key="locked"
@@ -115,7 +115,7 @@ export function StoryFutureMessage({ message, revealAt, hintText }: StoryFutureM
               transition={{ duration: 0.4 }}
               className="rounded-3xl bg-white border border-[#F0ECE8] p-8 shadow-sm"
             >
-              {/* Lock icon */}
+              
               <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-[#F5E9E2]">
                 <Lock className="h-7 w-7 text-[#E89AAE]" />
               </div>
@@ -125,7 +125,6 @@ export function StoryFutureMessage({ message, revealAt, hintText }: StoryFutureM
                 <span className="font-semibold text-[#2B2B2B]">{revealDate}</span>
               </p>
 
-              {/* Countdown */}
               <div className="flex items-center justify-center gap-3 flex-wrap">
                 {[
                   { value: countdown.days,    label: 'dias' },
@@ -149,7 +148,6 @@ export function StoryFutureMessage({ message, revealAt, hintText }: StoryFutureM
             </motion.div>
           )}
 
-          {/* ── UNLOCKED STATE (not yet revealed) ── */}
           {unlocked && !revealed && (
             <motion.div
               key="unlocked"
@@ -178,7 +176,6 @@ export function StoryFutureMessage({ message, revealAt, hintText }: StoryFutureM
             </motion.div>
           )}
 
-          {/* ── REVEALED STATE ── */}
           {unlocked && revealed && (
             <motion.div
               key="revealed"
@@ -187,13 +184,12 @@ export function StoryFutureMessage({ message, revealAt, hintText }: StoryFutureM
               transition={{ type: 'spring', stiffness: 180, damping: 18 }}
               className="relative rounded-3xl bg-white border border-[#F0ECE8] overflow-hidden shadow-lg"
             >
-              {/* Top accent bar */}
+              
               <div
                 className="h-1.5 w-full"
                 style={{ background: 'linear-gradient(90deg, #FF4D6D, #E89AAE, #C8B6E2)' }}
               />
 
-              {/* Confetti hearts */}
               {!reduce && (
                 <div className="absolute inset-0 overflow-hidden pointer-events-none">
                   {CONFETTI_POSITIONS.map((x, i) => (

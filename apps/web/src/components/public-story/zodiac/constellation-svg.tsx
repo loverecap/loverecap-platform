@@ -14,7 +14,6 @@ interface ConstellationSVGProps {
 export function ConstellationSVG({ data, revealed, width = 320, height = 240 }: ConstellationSVGProps) {
   const padding = 20
 
-  // Map normalized (0–1) coords to SVG space with padding
   function sx(x: number) {
     return padding + x * (width - padding * 2)
   }
@@ -30,12 +29,11 @@ export function ConstellationSVG({ data, revealed, width = 320, height = 240 }: 
       aria-hidden="true"
       style={{ overflow: 'visible' }}
     >
-      {/* Connection lines — render before stars so stars sit on top */}
+      
       {data.connections.map(([ai, bi], i) => {
         const a = data.stars[ai]
         const b = data.stars[bi]
         if (!a || !b) return null
-        // Delay: after both stars have appeared
         const starDelay = Math.max(ai, bi) * 0.15
         return (
           <ConnectionLine
@@ -50,7 +48,6 @@ export function ConstellationSVG({ data, revealed, width = 320, height = 240 }: 
         )
       })}
 
-      {/* Stars */}
       {data.stars.map((star, i) => (
         <Star
           key={i}

@@ -123,7 +123,7 @@ export function StoryExperience({
             transition={{ duration: 0.5 }}
             className="pb-20 bg-[#FFF8F2]"
           >
-            {/* ── Hero ─────────────────────────────────────────────────── */}
+            
             <StoryHero
               partnerName1={partnerName1}
               partnerName2={partnerName2}
@@ -131,7 +131,6 @@ export function StoryExperience({
               coverUrl={coverUrl}
             />
 
-            {/* ── Music ────────────────────────────────────────────────── */}
             {music && (
               <SectionReveal>
                 <StoryMusicPlayer
@@ -145,12 +144,10 @@ export function StoryExperience({
               </SectionReveal>
             )}
 
-            {/* ── Narrative bridge: music → memories ───────────────────── */}
             {memoriesWithAssets.length > 0 && (
               <StoryNarrativeDivider text="Toda história é feita de pequenos momentos." />
             )}
 
-            {/* ── Timeline ─────────────────────────────────────────────── */}
             {memoriesWithAssets.length > 0 && (
               <SectionReveal>
                 <StoryTimeline
@@ -160,31 +157,26 @@ export function StoryExperience({
               </SectionReveal>
             )}
 
-            {/* ── General gallery ──────────────────────────────────────── */}
             {projectAssets.length > 0 && (
               <SectionReveal>
                 <StoryGallery assets={projectAssets} />
               </SectionReveal>
             )}
 
-            {/* ── Narrative bridge: memories → letter ──────────────────── */}
             {finalMessage && (
               <StoryNarrativeDivider text="Algumas palavras merecem ser guardadas para sempre." />
             )}
 
-            {/* ── Love letter ──────────────────────────────────────────── */}
             {finalMessage && (
               <SectionReveal>
                 <StoryFinalMessage message={finalMessage} authorName={authorName} />
               </SectionReveal>
             )}
 
-            {/* ── "Hoje" section ───────────────────────────────────────── */}
             <SectionReveal>
               <StoryToday startDate={startDate} />
             </SectionReveal>
 
-            {/* ── Stats section ────────────────────────────────────────── */}
             <SectionReveal>
               <StoryStats
                 startDate={startDate}
@@ -194,7 +186,6 @@ export function StoryExperience({
               />
             </SectionReveal>
 
-            {/* ── Moon phase & Zodiac ──────────────────────────────────── */}
             <SectionReveal>
               <StoryMoonPhase startDate={startDate} />
             </SectionReveal>
@@ -202,7 +193,6 @@ export function StoryExperience({
               <StoryZodiac startDate={startDate} />
             </SectionReveal>
 
-            {/* ── Future message ───────────────────────────────────────── */}
             {futureMessage && (
               <SectionReveal>
                 <StoryFutureMessage
@@ -213,7 +203,6 @@ export function StoryExperience({
               </SectionReveal>
             )}
 
-            {/* ── CTA ──────────────────────────────────────────────────── */}
             <motion.section
               initial={reduce ? {} : { opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -225,7 +214,7 @@ export function StoryExperience({
                   'linear-gradient(180deg, #FFF8F2 0%, #FFF0F3 35%, #FDF2F8 70%, #FFFFFF 100%)',
               }}
             >
-              {/* Ambient glow */}
+              
               <div
                 className="absolute inset-0 pointer-events-none"
                 style={{
@@ -235,7 +224,7 @@ export function StoryExperience({
               />
 
               <div className="relative z-10">
-                {/* Beating heart icon */}
+                
                 <motion.div
                   initial={reduce ? {} : { scale: 0 }}
                   whileInView={{ scale: 1 }}
@@ -275,7 +264,6 @@ export function StoryExperience({
                   Crie o seu LoveRecap em minutos e compartilhe com quem você ama.
                 </p>
 
-                {/* Primary CTA button */}
                 <motion.div
                   whileHover={reduce ? {} : { scale: 1.04, y: -2 }}
                   whileTap={reduce ? {} : { scale: 0.97 }}

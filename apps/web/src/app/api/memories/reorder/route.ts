@@ -12,7 +12,6 @@ import {
   serverError,
 } from '@/lib/api-response'
 
-// POST /api/memories/reorder
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createRouteHandlerClient()

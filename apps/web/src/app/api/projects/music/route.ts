@@ -18,12 +18,10 @@ const schema = z
     project_id: z.string().uuid(),
     track_title: z.string().min(1).max(200),
     artist_name: z.string().max(200).optional(),
-    // YouTube fields (primary provider)
     provider: z.enum(['youtube', 'file', 'external_url']).default('youtube'),
     video_id: z.string().optional(),
     thumbnail_url: z.string().url().optional().or(z.literal('')),
     duration: z.string().optional(),
-    // Legacy fields — kept for backward compatibility; not used in new UI
     storage_path: z.string().optional(),
     external_url: z.string().url().optional(),
   })
@@ -32,8 +30,6 @@ const schema = z
     { message: 'Forneça video_id, storage_path ou external_url' },
   )
 
-// POST /api/projects/music
-// Upserts a music track for a project (one track per project).
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createRouteHandlerClient()
@@ -78,7 +74,6 @@ export async function POST(request: NextRequest) {
           video_id: video_id ?? null,
           thumbnail_url: thumbnail_url || null,
           duration: duration ?? null,
-          // Legacy
           storage_path: storage_path ?? null,
           external_url: external_url ?? null,
         },
@@ -96,8 +91,6 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// DELETE /api/projects/music?project_id=<uuid>
-// Removes the music track from a project.
 export async function DELETE(request: NextRequest) {
   try {
     const supabase = await createRouteHandlerClient()

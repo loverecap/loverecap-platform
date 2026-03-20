@@ -15,7 +15,6 @@ export default async function Image({ params }: { params: Promise<{ slug: string
   const name2 = project?.partner_name_2 ?? '?'
   const isPublished = project?.status === 'published'
 
-  // Fall back to a generic branded card if the story isn't found / not published.
   if (!project || !isPublished) {
     return new ImageResponse(
       (

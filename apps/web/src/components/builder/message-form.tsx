@@ -35,12 +35,9 @@ export function MessageForm() {
   const { state, dispatch } = useBuilder()
   const router = useRouter()
   const [isGenerating, setIsGenerating] = useState(false)
-  // Up to 3 cached AI messages
   const [aiMessages, setAiMessages] = useState<string[]>([])
-  // Index of currently shown cached message (0-based)
   const [aiIndex, setAiIndex] = useState(0)
 
-  // Restore cache from sessionStorage on mount
   useEffect(() => {
     try {
       const raw = sessionStorage.getItem(AI_CACHE_KEY)
@@ -52,7 +49,6 @@ export function MessageForm() {
         }
       }
     } catch {
-      // ignore parse errors
     }
   }, [])
 
@@ -85,13 +81,7 @@ export function MessageForm() {
     }
   }
 
-  /**
-   * Single handler for the AI button:
-   * - Clicks 1–3: generates a new message via API and caches it
-   * - Clicks 4+:  cycles through the 3 saved messages (no API call)
-   */
   async function handleAIClick() {
-    // If we haven't reached the limit yet, generate a new one
     if (aiMessages.length < AI_MAX) {
       setIsGenerating(true)
       try {
@@ -123,13 +113,11 @@ export function MessageForm() {
       return
     }
 
-    // Limit reached — cycle through cached messages instead
     const next = (aiIndex + 1) % aiMessages.length
     setAiIndex(next)
     form.setValue('message', aiMessages[next]!, { shouldValidate: true })
   }
 
-  // Derived state for button label/icon
   const isCycling = aiMessages.length >= AI_MAX
   const remaining = AI_MAX - aiMessages.length
 
@@ -156,7 +144,6 @@ export function MessageForm() {
                 <div className="flex items-center justify-between mb-1.5">
                   <FormLabel className="mb-0">Sua mensagem</FormLabel>
 
-                  {/* Single AI button: generates first 3, then cycles */}
                   <button
                     type="button"
                     onClick={handleAIClick}

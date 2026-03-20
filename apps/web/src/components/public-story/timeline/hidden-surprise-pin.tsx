@@ -15,7 +15,7 @@ export function HiddenSurprisePin({ message, emoji = '💌' }: HiddenSurprisePin
 
   return (
     <>
-      {/* Trigger button */}
+      
       <motion.button
         onClick={() => setOpen(true)}
         className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#FFD0DC] bg-[#FFF0F3] text-[#FF4D6D] text-xs font-semibold cursor-pointer select-none"
@@ -23,7 +23,7 @@ export function HiddenSurprisePin({ message, emoji = '💌' }: HiddenSurprisePin
         whileTap={reduce ? {} : { scale: 0.96 }}
         aria-label="Abrir surpresa escondida"
       >
-        {/* Pulsing ring */}
+        
         {!reduce && (
           <span className="relative flex h-4 w-4 shrink-0">
             <motion.span
@@ -40,7 +40,6 @@ export function HiddenSurprisePin({ message, emoji = '💌' }: HiddenSurprisePin
         Surpresa escondida
       </motion.button>
 
-      {/* Modal overlay */}
       <AnimatePresence>
         {open && (
           <motion.div
@@ -50,13 +49,12 @@ export function HiddenSurprisePin({ message, emoji = '💌' }: HiddenSurprisePin
             exit={{ opacity: 0 }}
             transition={{ duration: reduce ? 0 : 0.2 }}
           >
-            {/* Backdrop */}
+            
             <motion.div
               className="absolute inset-0 bg-black/40 backdrop-blur-sm"
               onClick={() => setOpen(false)}
             />
 
-            {/* Card */}
             <motion.div
               className="relative z-10 w-full max-w-sm rounded-3xl bg-white shadow-2xl shadow-[#FF4D6D]/10 overflow-hidden"
               initial={reduce ? {} : { scale: 0.82, opacity: 0, y: 20 }}
@@ -64,15 +62,14 @@ export function HiddenSurprisePin({ message, emoji = '💌' }: HiddenSurprisePin
               exit={reduce ? {} : { scale: 0.88, opacity: 0, y: 12 }}
               transition={{ type: 'spring', stiffness: 280, damping: 22 }}
             >
-              {/* Top accent */}
+              
               <div
                 className="h-1.5 w-full"
                 style={{ background: 'linear-gradient(90deg, #FF4D6D, #E89AAE, #C8B6E2)' }}
               />
 
-              {/* Content */}
               <div className="p-8 text-center">
-                {/* Big emoji */}
+                
                 <motion.div
                   initial={reduce ? {} : { scale: 0 }}
                   animate={reduce ? {} : { scale: 1 }}
@@ -96,7 +93,6 @@ export function HiddenSurprisePin({ message, emoji = '💌' }: HiddenSurprisePin
                 </motion.p>
               </div>
 
-              {/* Close button */}
               <div className="px-8 pb-7 flex justify-center">
                 <button
                   onClick={() => setOpen(false)}

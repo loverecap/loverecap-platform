@@ -7,8 +7,6 @@ import { rateLimit } from '@/lib/rate-limit'
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY })
 
-// Sanitize a free-text string: strip newlines and control characters that could
-// be used for prompt injection, then trim to a safe maximum length.
 function sanitize(value: string, maxLength: number): string {
   return value.replace(/[\r\n\t\x00-\x1F\x7F]/g, ' ').trim().slice(0, maxLength)
 }
@@ -24,14 +22,12 @@ const schema = z.object({
 })
 
 export async function POST(req: NextRequest) {
-  // ── Auth ────────────────────────────────────────────────────────────────
   const supabase = await createRouteHandlerClient()
   const user = await requireUser(supabase).catch(() => null)
   if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  // ── Rate limit: 10 generations per user per hour ────────────────────────
   const rl = rateLimit(`ai:${user.id}`, 10, 60 * 60 * 1000)
   if (!rl.success) {
     return NextResponse.json(
@@ -47,7 +43,6 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Dados inválidos', issues: parsed.error.flatten().fieldErrors }, { status: 400 })
     }
 
-    // Sanitize all string inputs before inserting into the prompt
     const partnerName1 = sanitize(parsed.data.partnerName1, 60)
     const partnerName2 = sanitize(parsed.data.partnerName2, 60)
     const startDate = parsed.data.startDate

@@ -24,7 +24,7 @@ export function MusicResultCard({ track, isSelected, isPreviewing, onSelect, onT
           : 'border-neutral-100 bg-white hover:border-neutral-200 hover:bg-neutral-50'
       }`}
     >
-      {/* Thumbnail */}
+      
       <div className="relative shrink-0 h-12 w-12 rounded-lg overflow-hidden bg-neutral-100">
         {track.thumbnail ? (
           <img
@@ -40,7 +40,6 @@ export function MusicResultCard({ track, isSelected, isPreviewing, onSelect, onT
         )}
       </div>
 
-      {/* Info */}
       <div className="flex-1 min-w-0">
         <p className="text-sm font-semibold text-neutral-900 truncate leading-snug">{track.title}</p>
         <div className="flex items-center gap-1.5 mt-0.5">
@@ -50,7 +49,6 @@ export function MusicResultCard({ track, isSelected, isPreviewing, onSelect, onT
         </div>
       </div>
 
-      {/* Preview button */}
       <button
         type="button"
         onClick={(e) => {
@@ -71,7 +69,6 @@ export function MusicResultCard({ track, isSelected, isPreviewing, onSelect, onT
         )}
       </button>
 
-      {/* Selected check */}
       {isSelected && (
         <div className="shrink-0 flex h-5 w-5 items-center justify-center rounded-full bg-[#FF4D6D]">
           <Check className="h-3 w-3 text-white" strokeWidth={3} />

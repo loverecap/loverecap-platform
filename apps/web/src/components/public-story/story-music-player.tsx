@@ -13,7 +13,6 @@ interface StoryMusicPlayerProps {
   audioUrl: string | null | undefined
 }
 
-// ─── Equalizer bars ────────────────────────────────────────────────────────
 const BAR_HEIGHTS = [0.5, 1.0, 0.65, 0.85, 0.55, 0.75, 0.45]
 
 function EqualizerBars({ playing }: { playing: boolean }) {
@@ -41,7 +40,6 @@ function EqualizerBars({ playing }: { playing: boolean }) {
   )
 }
 
-// ─── YouTube postMessage control ──────────────────────────────────────────
 function sendYT(iframe: HTMLIFrameElement | null, func: string) {
   iframe?.contentWindow?.postMessage(
     JSON.stringify({ event: 'command', func, args: [] }),
@@ -49,7 +47,6 @@ function sendYT(iframe: HTMLIFrameElement | null, func: string) {
   )
 }
 
-// ─── YouTube player ───────────────────────────────────────────────────────
 function YouTubeMusicPlayer({
   videoId,
   trackTitle,
@@ -65,16 +62,15 @@ function YouTubeMusicPlayer({
   const [playing, setPlaying] = useState(false)
   const reduce = useReducedMotion()
 
-  // Listen for YouTube state change events
   useEffect(() => {
     function onMessage(e: MessageEvent) {
       if (typeof e.data !== 'string') return
       try {
         const data = JSON.parse(e.data) as { event?: string; info?: number }
         if (data.event === 'onStateChange') {
-          setPlaying(data.info === 1) // 1 = playing
+          setPlaying(data.info === 1)
         }
-      } catch { /* ignore */ }
+      } catch {  }
     }
     window.addEventListener('message', onMessage)
     return () => window.removeEventListener('message', onMessage)
@@ -87,7 +83,6 @@ function YouTubeMusicPlayer({
     )
   }
 
-  // Optimistic toggle — UI responds instantly, YouTube confirms async
   const toggle = useCallback(() => {
     if (playing) {
       setPlaying(false)
@@ -102,7 +97,7 @@ function YouTubeMusicPlayer({
 
   return (
     <div className="relative">
-      {/* Hidden YouTube iframe — audio only, no visual space */}
+      
       <div
         aria-hidden="true"
         style={{ position: 'absolute', width: 0, height: 0, overflow: 'hidden', pointerEvents: 'none' }}
@@ -118,7 +113,6 @@ function YouTubeMusicPlayer({
         />
       </div>
 
-      {/* ── Custom player card ────────────────────────────────────────────── */}
       <motion.div
         initial={reduce ? {} : { opacity: 0, y: 28 }}
         whileInView={reduce ? {} : { opacity: 1, y: 0 }}
@@ -130,10 +124,9 @@ function YouTubeMusicPlayer({
           className="overflow-hidden rounded-3xl"
           style={{ boxShadow: '0 8px 32px rgba(255,77,109,0.16), 0 2px 8px rgba(0,0,0,0.06)' }}
         >
-          {/* ── Horizontal split: album art left, info right ────────────── */}
+          
           <div className="flex" style={{ minHeight: 160 }}>
 
-            {/* LEFT — Album art (50% width) */}
             <div className="relative w-1/2 shrink-0">
               <img
                 src={thumbSrc}
@@ -142,12 +135,12 @@ function YouTubeMusicPlayer({
                 style={{ minHeight: 160 }}
                 loading="lazy"
               />
-              {/* Subtle right-edge fade so it blends into the right panel */}
+              
               <div
                 className="absolute inset-y-0 right-0 w-8 pointer-events-none"
                 style={{ background: 'linear-gradient(to right, transparent, rgba(255,255,255,0.9))' }}
               />
-              {/* Playing glow on art */}
+              
               {playing && !reduce && (
                 <motion.div
                   className="absolute inset-0 pointer-events-none"
@@ -158,12 +151,11 @@ function YouTubeMusicPlayer({
               )}
             </div>
 
-            {/* RIGHT — Track info + controls */}
             <div
               className="flex flex-1 flex-col justify-between px-4 py-4"
               style={{ background: 'linear-gradient(135deg, #FFFFFF 0%, #FFF5F7 100%)' }}
             >
-              {/* Top: label + equalizer */}
+              
               <div className="flex items-center justify-between">
                 <span className="text-[9px] font-semibold uppercase tracking-[0.22em] text-[#E89AAE]">
                   Nossa música
@@ -182,7 +174,6 @@ function YouTubeMusicPlayer({
                 </AnimatePresence>
               </div>
 
-              {/* Middle: title + artist */}
               <div className="space-y-0.5 my-2">
                 <p className="font-story text-base font-bold text-[#2B2B2B] leading-snug line-clamp-2">
                   {trackTitle}
@@ -192,7 +183,6 @@ function YouTubeMusicPlayer({
                 )}
               </div>
 
-              {/* Bottom: play/pause button */}
               <div className="flex items-center">
                 <motion.button
                   whileHover={reduce ? {} : { scale: 1.1 }}
@@ -207,7 +197,7 @@ function YouTubeMusicPlayer({
                       : '0 4px 14px rgba(255,77,109,0.32)',
                   }}
                 >
-                  {/* Pulse ring when playing */}
+                  
                   {playing && !reduce && (
                     <motion.span
                       className="absolute inset-0 rounded-full border border-[#FF4D6D]/60"
@@ -250,7 +240,6 @@ function YouTubeMusicPlayer({
   )
 }
 
-// ─── Legacy audio player ─────────────────────────────────────────────────
 function LegacyAudioPlayer({
   audioUrl,
   trackTitle,
@@ -323,7 +312,6 @@ function LegacyAudioPlayer({
   )
 }
 
-// ─── Main export ──────────────────────────────────────────────────────────
 export function StoryMusicPlayer({
   provider,
   trackTitle,

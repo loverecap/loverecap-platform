@@ -10,7 +10,6 @@ export async function GET(request: NextRequest) {
 
   const supabase = await createRouteHandlerClient()
 
-  // Exchange the code for a session (magic link / OAuth flows)
   if (code) {
     const { error } = await supabase.auth.exchangeCodeForSession(code)
     if (error) {
@@ -18,14 +17,10 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  // If a custom redirect was requested (e.g. ?next=/some-path), honor it.
-  // Only allow relative paths to prevent open-redirect attacks.
   if (next && /^\/(?!\/)/.test(next)) {
     return NextResponse.redirect(new URL(next, requestUrl.origin))
   }
 
-  // Password sign-in path also lands here — session is already set, just redirect
-  // Smart redirect: user with projects → /dashboard, otherwise → /create
   try {
     const {
       data: { user },
@@ -39,7 +34,6 @@ export async function GET(request: NextRequest) {
     const destination = projects.length > 0 ? '/dashboard' : '/create'
     return NextResponse.redirect(new URL(destination, requestUrl.origin))
   } catch {
-    // Fallback: go to create
     return NextResponse.redirect(new URL('/create', requestUrl.origin))
   }
 }

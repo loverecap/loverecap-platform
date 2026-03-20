@@ -19,7 +19,6 @@ export function PhotosForm() {
   const [uploading, setUploading] = useState<string[]>([])
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  // Reset file input when window regains focus (Android back button dismisses picker)
   useEffect(() => {
     const handleFocus = () => {
       if (fileInputRef.current) fileInputRef.current.value = ''
@@ -38,7 +37,6 @@ export function PhotosForm() {
       return
     }
 
-    // Bug 1: enforce max 6 photos
     if (photos.length + uploading.length >= MAX_PHOTOS) {
       toast.error(`Limite de ${MAX_PHOTOS} fotos atingido.`)
       return
@@ -136,7 +134,6 @@ export function PhotosForm() {
         onChange={handleFileChange}
       />
 
-      {/* Upload button — hidden when at limit */}
       {!atLimit && (
         <button
           onClick={() => fileInputRef.current?.click()}
@@ -154,7 +151,6 @@ export function PhotosForm() {
         </button>
       )}
 
-      {/* Limit reached message */}
       {atLimit && (
         <div className="rounded-xl border border-neutral-200 bg-neutral-50 px-5 py-4 text-center">
           <p className="text-sm font-medium text-neutral-700">Limite de {MAX_PHOTOS} fotos atingido</p>

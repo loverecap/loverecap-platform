@@ -24,7 +24,6 @@ export function StoryGallery({ assets }: StoryGalleryProps) {
 
   if (photos.length === 0) return null
 
-  // Tracks active index based on scroll position fraction
   function onScroll() {
     const el = scrollRef.current
     if (!el || photos.length <= 1) return
@@ -32,7 +31,6 @@ export function StoryGallery({ assets }: StoryGalleryProps) {
     setActive(Math.max(0, Math.min(photos.length - 1, Math.round(progress * (photos.length - 1)))))
   }
 
-  // Smooth-scroll to a specific photo via dot click
   function scrollTo(i: number) {
     const el = scrollRef.current
     if (!el) return
@@ -46,7 +44,7 @@ export function StoryGallery({ assets }: StoryGalleryProps) {
         className="py-20"
         style={{ background: 'linear-gradient(180deg, #FFF8F2 0%, #F5E9E2 50%, #FFF8F2 100%)' }}
       >
-        {/* Header */}
+        
         <motion.div
           initial={reduce ? {} : { opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -69,9 +67,8 @@ export function StoryGallery({ assets }: StoryGalleryProps) {
           />
         </motion.div>
 
-        {/* ── Horizontal snap scroll ─────────────────────────────────────── */}
         {photos.length === 1 ? (
-          /* Single photo — full-width hero */
+          
           <motion.div
             initial={reduce ? {} : { opacity: 0, scale: 0.96 }}
             whileInView={reduce ? {} : { opacity: 1, scale: 1 }}
@@ -98,10 +95,7 @@ export function StoryGallery({ assets }: StoryGalleryProps) {
           </motion.div>
         ) : (
           <>
-            {/* Constrain to max-w-lg so % padding and vw-based card widths
-                are calculated relative to a consistent container, not the full
-                viewport. Without this, 11% = 158px on a 1440px screen and
-                78vw = 1123px (capped at 340px), breaking the layout. */}
+            
             <div className="max-w-lg mx-auto">
             <div
               ref={scrollRef}
@@ -136,7 +130,7 @@ export function StoryGallery({ assets }: StoryGalleryProps) {
                     }
                   }}
                 >
-                  {/* Card — scale & shadow change based on active */}
+                  
                   <div
                     className="relative overflow-hidden rounded-3xl"
                     style={{
@@ -158,7 +152,6 @@ export function StoryGallery({ assets }: StoryGalleryProps) {
                       sizes="(max-width: 640px) 78vw, 340px"
                     />
 
-                    {/* Bottom gradient + counter */}
                     <div
                       className="absolute inset-x-0 bottom-0 h-20 pointer-events-none"
                       style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.50), transparent)' }}
@@ -167,7 +160,6 @@ export function StoryGallery({ assets }: StoryGalleryProps) {
                       {i + 1}/{photos.length}
                     </span>
 
-                    {/* Expand hint on active card only */}
                     <AnimatePresence>
                       {active === i && (
                         <motion.div
@@ -182,7 +174,6 @@ export function StoryGallery({ assets }: StoryGalleryProps) {
                       )}
                     </AnimatePresence>
 
-                    {/* Active: subtle pink glow border */}
                     {active === i && (
                       <motion.div
                         className="absolute inset-0 rounded-3xl ring-2 ring-[#FF4D6D]/40 pointer-events-none"
@@ -197,7 +188,6 @@ export function StoryGallery({ assets }: StoryGalleryProps) {
               ))}
             </div>
 
-            {/* ── Dot navigation ─────────────────────────────────────────── */}
             <div className="flex justify-center items-center gap-1.5 mt-6 px-5">
               {photos.map((_, i) => (
                 <motion.button
@@ -214,12 +204,11 @@ export function StoryGallery({ assets }: StoryGalleryProps) {
                 />
               ))}
             </div>
-          </div>{/* closes max-w-lg mx-auto */}
+          </div>
           </>
         )}
       </section>
 
-      {/* ── Lightbox ──────────────────────────────────────────────────────── */}
       <AnimatePresence>
         {lightbox && (
           <motion.div
@@ -230,7 +219,7 @@ export function StoryGallery({ assets }: StoryGalleryProps) {
             className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 px-5"
             onClick={() => setLightbox(null)}
           >
-            {/* Blurred background of the same photo */}
+            
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
               <img
                 src={lightbox}
@@ -249,7 +238,7 @@ export function StoryGallery({ assets }: StoryGalleryProps) {
               className="relative w-full max-w-sm z-10"
               onClick={(e) => e.stopPropagation()}
             >
-              {/* Photo */}
+              
               <div
                 className="relative overflow-hidden rounded-3xl"
                 style={{ aspectRatio: '3/4', boxShadow: '0 24px 64px rgba(0,0,0,0.5)' }}
@@ -263,7 +252,6 @@ export function StoryGallery({ assets }: StoryGalleryProps) {
                 />
               </div>
 
-              {/* Close button */}
               <motion.button
                 whileHover={reduce ? {} : { scale: 1.1 }}
                 whileTap={reduce ? {} : { scale: 0.92 }}

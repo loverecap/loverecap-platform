@@ -31,7 +31,7 @@ export default async function DashboardPage() {
       <Nav />
       <main className="min-h-[calc(100vh-4rem)] bg-neutral-50">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          {/* Header */}
+          
           <div className="flex items-center justify-between mb-10">
             <div>
               <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#E89AAE] mb-1">
@@ -49,7 +49,6 @@ export default async function DashboardPage() {
             </Button>
           </div>
 
-          {/* Empty state */}
           {projects.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-20 text-center">
               <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-[#FFF0F3]">

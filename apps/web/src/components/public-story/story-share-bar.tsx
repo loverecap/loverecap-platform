@@ -18,7 +18,6 @@ export function StoryShareBar({ url, title }: StoryShareBarProps) {
       setCopied(true)
       setTimeout(() => setCopied(false), 2200)
     } catch {
-      // clipboard unavailable
     }
   }
 
@@ -27,7 +26,6 @@ export function StoryShareBar({ url, title }: StoryShareBarProps) {
       try {
         await navigator.share({ title, url })
       } catch {
-        // user dismissed
       }
     } else {
       await handleCopy()

@@ -14,7 +14,6 @@ export function BuilderLayout({ children }: BuilderLayoutProps) {
   const pathname = usePathname()
   const router = useRouter()
 
-  // Derive current step from URL — single source of truth
   const currentStep: BuilderStep =
     (BUILDER_STEPS.find((s) => pathname === STEP_URLS[s]) as BuilderStep | undefined) ?? 'info'
 

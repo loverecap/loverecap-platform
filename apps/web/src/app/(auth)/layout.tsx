@@ -25,18 +25,17 @@ const testimonials = [
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen flex">
-      {/* Left panel — brand (hidden on mobile) */}
+      
       <div
         className="hidden lg:flex lg:w-1/2 relative flex-col justify-between p-12 overflow-hidden"
         style={{
           background: 'linear-gradient(155deg, #FFF8F2 0%, #F5E9E2 55%, #F8C8DC 100%)',
         }}
       >
-        {/* Decorative blobs */}
+        
         <div className="absolute top-0 right-0 w-96 h-96 rounded-full bg-[#F8C8DC]/40 -translate-y-1/2 translate-x-1/3 blur-3xl pointer-events-none" />
         <div className="absolute bottom-0 left-0 w-80 h-80 rounded-full bg-[#FFE0E8]/35 translate-y-1/2 -translate-x-1/3 blur-3xl pointer-events-none" />
 
-        {/* Floating hearts */}
         {[
           { top: '15%', left: '10%', size: 14, delay: 0 },
           { top: '25%', right: '12%', size: 10, delay: 0.4 },
@@ -58,13 +57,11 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
           </motion.div>
         ))}
 
-        {/* Logo */}
         <Link href="/" className="relative z-10 flex items-center gap-2 font-heading font-bold text-neutral-900 w-fit">
           <Heart className="h-5 w-5 fill-[#FF4D6D] text-[#FF4D6D]" />
           <span>LoveRecap</span>
         </Link>
 
-        {/* Hero text */}
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
@@ -87,7 +84,6 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
           </p>
         </motion.div>
 
-        {/* Testimonials */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -114,9 +110,8 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         </motion.div>
       </div>
 
-      {/* Right panel — form */}
       <div className="flex-1 flex flex-col min-h-screen bg-white">
-        {/* Mobile logo */}
+        
         <div className="flex lg:hidden items-center justify-center pt-8 pb-2">
           <Link href="/" className="flex items-center gap-2 font-heading font-bold text-neutral-900">
             <Heart className="h-5 w-5 fill-[#FF4D6D] text-[#FF4D6D]" />

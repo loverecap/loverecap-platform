@@ -25,7 +25,6 @@ export function MusicForm() {
 
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  // Debounced search — fires 500ms after the user stops typing
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current)
 
@@ -101,7 +100,7 @@ export function MusicForm() {
 
   return (
     <div className="space-y-8">
-      {/* Header */}
+      
       <div>
         <h1 className="font-heading text-2xl font-bold text-neutral-900">Música da história</h1>
         <p className="mt-1 text-sm text-neutral-500">
@@ -109,7 +108,6 @@ export function MusicForm() {
         </p>
       </div>
 
-      {/* Selected track card */}
       {selectedTrack ? (
         <div className="space-y-4">
           <div className="flex items-center gap-4 rounded-2xl border border-[#FFD0DC] bg-[#FFF0F3]/60 p-4">
@@ -144,7 +142,7 @@ export function MusicForm() {
           </p>
         </div>
       ) : (
-        /* Search area */
+        
         <div className="space-y-3">
           <MusicSearchInput
             value={query}
@@ -152,13 +150,11 @@ export function MusicForm() {
             loading={isSearching}
           />
 
-          {/* Preview player (inline, above results) */}
           <MusicPreviewPlayer
             videoId={previewingId}
             onClose={() => setPreviewingId(null)}
           />
 
-          {/* Empty / hint state */}
           {!query && (
             <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed border-neutral-200 bg-neutral-50 py-10 text-center">
               <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#FFF0F3]">
@@ -173,7 +169,6 @@ export function MusicForm() {
             </div>
           )}
 
-          {/* No results */}
           {query.trim().length >= 2 && !isSearching && results.length === 0 && (
             <div className="text-center py-6">
               <p className="text-sm text-neutral-500">Nenhuma música encontrada.</p>
@@ -187,7 +182,6 @@ export function MusicForm() {
             </div>
           )}
 
-          {/* Results list */}
           <MusicResultList
             tracks={results}
             selectedId={selectedVideoId}
@@ -198,7 +192,6 @@ export function MusicForm() {
         </div>
       )}
 
-      {/* Navigation */}
       <div className="flex items-center justify-between pt-2">
         <Button type="button" variant="ghost" onClick={() => router.push('/create/message')}>
           <ArrowLeft className="h-4 w-4" />

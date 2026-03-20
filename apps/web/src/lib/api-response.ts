@@ -1,8 +1,5 @@
 import { NextResponse } from 'next/server'
 
-// Standard API envelope: every response is { data, error }
-// so clients always have a consistent shape to destructure.
-
 export function ok<T>(data: T, status = 200) {
   return NextResponse.json({ data, error: null }, { status })
 }
@@ -11,7 +8,6 @@ export function err(message: string, status: number, code?: string) {
   return NextResponse.json({ data: null, error: { message, code } }, { status })
 }
 
-// Accepts any Zod-like error with a flatten() method — avoids cross-version type conflicts.
 export function validationError(error: { flatten(): { fieldErrors: unknown } }) {
   return NextResponse.json(
     {
