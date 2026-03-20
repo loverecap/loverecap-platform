@@ -1,10 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import { Heart, ArrowLeft, Check, Lock, Sparkles } from 'lucide-react'
+import { Heart, ArrowLeft, Check, Lock, Sparkles, CheckCircle2, Loader2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
-import { Separator } from '@/components/ui/separator'
 import { useBuilder } from '@/contexts/builder-context'
 import { formatDate } from '@loverecap/utils'
 import { PixPayment } from '@/components/payment/pix-payment'
@@ -12,7 +11,6 @@ import { PixPayment } from '@/components/payment/pix-payment'
 export function ReviewScreen() {
   const { state, dispatch } = useBuilder()
   const [showPix, setShowPix] = useState(false)
-  // Bug 8 fix: track payment success so we don't flash "no data" after RESET
   const [paymentDone, setPaymentDone] = useState(false)
   const router = useRouter()
 
@@ -23,6 +21,30 @@ export function ReviewScreen() {
         <Button variant="ghost" className="mt-4" onClick={() => router.push('/create/info')}>
           Voltar
         </Button>
+      </div>
+    )
+  }
+
+  // Bug 5: skeleton loading screen while redirect happens after payment
+  if (paymentDone) {
+    return (
+      <div className="flex flex-col items-center gap-8 py-10 text-center">
+        <div className="flex flex-col items-center gap-3">
+          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-green-50">
+            <CheckCircle2 className="h-8 w-8 text-green-500" />
+          </div>
+          <p className="font-heading text-xl font-bold text-neutral-900">Pagamento confirmado!</p>
+          <p className="text-sm text-neutral-500">Sua história está sendo publicada...</p>
+          <Loader2 className="h-5 w-5 animate-spin text-neutral-400" />
+        </div>
+
+        {/* Skeleton placeholders */}
+        <div className="w-full space-y-3">
+          <div className="h-44 w-full animate-pulse rounded-2xl bg-neutral-100" />
+          <div className="h-5 w-3/4 animate-pulse rounded-lg bg-neutral-100 mx-auto" />
+          <div className="h-5 w-1/2 animate-pulse rounded-lg bg-neutral-100 mx-auto" />
+          <div className="h-12 w-full animate-pulse rounded-xl bg-neutral-100" />
+        </div>
       </div>
     )
   }
@@ -44,7 +66,6 @@ export function ReviewScreen() {
             className="select-none pointer-events-none"
             style={{ filter: 'blur(3.5px)', transform: 'scale(1.02)', transformOrigin: 'center' }}
           >
-            {/* Hero */}
             <div className="bg-linear-to-br from-[#FF4D6D] to-[#FF8FA3] px-6 pt-10 pb-8 text-center text-white">
               <div className="text-4xl mb-3">{state.memories[0]?.emoji ?? '❤️'}</div>
               <h2 className="font-heading text-xl font-bold mb-1">
@@ -56,16 +77,13 @@ export function ReviewScreen() {
                 </p>
               )}
             </div>
-            {/* Timeline preview */}
             <div className="bg-white px-5 py-4 space-y-3">
               {state.memories.slice(0, 3).map((m) => (
                 <div key={m.id} className="flex items-center gap-3 py-1.5 border-b border-neutral-100 last:border-0">
                   <span className="text-xl shrink-0">{m.emoji}</span>
                   <div>
                     <p className="text-sm font-medium text-neutral-900">{m.title}</p>
-                    {m.occurred_at && (
-                      <p className="text-xs text-neutral-400">{m.occurred_at}</p>
-                    )}
+                    {m.occurred_at && <p className="text-xs text-neutral-400">{m.occurred_at}</p>}
                   </div>
                 </div>
               ))}
@@ -111,8 +129,6 @@ export function ReviewScreen() {
               <p className="text-[11px] text-neutral-400">pagamento único · sem mensalidade</p>
             </div>
           </div>
-
-          {/* Bug 7: More emotional features list with FOMO */}
           <ul className="space-y-1.5 mt-3">
             {[
               'Sua história online para sempre — nunca some',
@@ -125,67 +141,13 @@ export function ReviewScreen() {
               </li>
             ))}
           </ul>
-
-          {/* Urgency note */}
           <p className="mt-3 text-[11px] text-neutral-400 text-center border-t border-neutral-200 pt-3">
             Se você não publicar agora, sua história fica apenas como rascunho.
           </p>
         </div>
       )}
 
-      {/* Summary card */}
-      {state.info && (
-        <div className="overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm">
-          <div className="bg-linear-to-br from-[#FF4D6D] to-[#FF6B8A] p-6 text-center text-white">
-            <div className="flex items-center justify-center gap-2 mb-1">
-              <Heart className="h-5 w-5 fill-white" />
-              <span className="font-heading text-xl font-bold">
-                {state.info.partner_name_1} &amp; {state.info.partner_name_2}
-              </span>
-            </div>
-            {state.info.relationship_start_date && (
-              <p className="text-sm text-white/80">
-                Juntos desde {formatDate(state.info.relationship_start_date)}
-              </p>
-            )}
-          </div>
-
-          <div className="p-5 space-y-4">
-            <div>
-              <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-neutral-400">
-                Linha do tempo · {state.memories.length}{' '}
-                {state.memories.length === 1 ? 'memória' : 'memórias'}
-              </p>
-              <div className="space-y-2">
-                {state.memories.map((memory) => (
-                  <div key={memory.id} className="flex items-center gap-2 text-sm">
-                    {memory.emoji && <span>{memory.emoji}</span>}
-                    <span className="text-neutral-700">{memory.title}</span>
-                    {memory.occurred_at && (
-                      <span className="ml-auto text-xs text-neutral-400">{memory.occurred_at}</span>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {state.finalMessage && (
-              <>
-                <Separator />
-                <div>
-                  <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-neutral-400">
-                    Mensagem final
-                  </p>
-                  <p className="text-sm italic leading-relaxed text-neutral-600 line-clamp-3">
-                    &ldquo;{state.finalMessage}&rdquo;
-                  </p>
-                </div>
-              </>
-            )}
-          </div>
-        </div>
-      )}
-
+      {/* PIX payment or CTA */}
       {showPix && state.projectId ? (
         <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
           <h2 className="font-heading mb-4 text-center text-lg font-semibold text-neutral-900">
@@ -194,28 +156,35 @@ export function ReviewScreen() {
           <PixPayment
             projectId={state.projectId}
             onSuccess={() => {
-              // Bug 8 fix: mark payment done BEFORE dispatching RESET
-              // so the review screen doesn't flash "no data found"
               setPaymentDone(true)
               dispatch({ type: 'RESET' })
             }}
           />
         </div>
       ) : (
-        <div className="flex items-center justify-between">
-          <Button type="button" variant="ghost" onClick={() => router.push('/create/music')}>
+        /* Bug 4: mobile-friendly full-width layout */
+        <div className="flex flex-col gap-3">
+          <Button
+            size="lg"
+            className="w-full h-14 text-base"
+            onClick={() => setShowPix(true)}
+          >
+            <Sparkles className="h-4 w-4 shrink-0" />
+            Guardar esta história — R$9,99
+          </Button>
+          <p className="text-center text-[11px] text-neutral-400">
+            Sem mensalidade · fica online para sempre
+          </p>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="w-full"
+            onClick={() => router.push('/create/music')}
+          >
             <ArrowLeft className="h-4 w-4" />
             Voltar
           </Button>
-
-          {/* Bug 7: FOMO payment button */}
-          <div className="flex flex-col items-end gap-1">
-            <Button size="lg" onClick={() => setShowPix(true)} className="gap-2">
-              <Sparkles className="h-4 w-4" />
-              Guardar esta história — R$9,99
-            </Button>
-            <p className="text-[11px] text-neutral-400">Sem mensalidade · fica online para sempre</p>
-          </div>
         </div>
       )}
     </div>

@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button'
 import { useBuilder } from '@/contexts/builder-context'
 
 const MAX_SIZE_MB = 10
+const MAX_PHOTOS = 6
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp']
 
 export function PhotosForm() {
@@ -18,7 +19,7 @@ export function PhotosForm() {
   const [uploading, setUploading] = useState<string[]>([])
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  // Bug 2 fix: reset file input when window regains focus (Android back button dismisses picker)
+  // Reset file input when window regains focus (Android back button dismisses picker)
   useEffect(() => {
     const handleFocus = () => {
       if (fileInputRef.current) fileInputRef.current.value = ''
@@ -28,10 +29,18 @@ export function PhotosForm() {
   }, [])
 
   const photos = state.uploadedPhotos
+  const atLimit = photos.length >= MAX_PHOTOS
+  const remaining = MAX_PHOTOS - photos.length
 
   async function uploadFile(file: File) {
     if (!state.projectId) {
       toast.error('Projeto não encontrado. Por favor, volte.')
+      return
+    }
+
+    // Bug 1: enforce max 6 photos
+    if (photos.length + uploading.length >= MAX_PHOTOS) {
+      toast.error(`Limite de ${MAX_PHOTOS} fotos atingido.`)
       return
     }
 
@@ -95,7 +104,7 @@ export function PhotosForm() {
   }
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const files = Array.from(e.target.files ?? [])
+    const files = Array.from(e.target.files ?? []).slice(0, remaining)
     files.forEach((file) => void uploadFile(file))
     e.target.value = ''
   }
@@ -114,7 +123,7 @@ export function PhotosForm() {
       <div>
         <h1 className="font-heading text-2xl font-bold text-neutral-900">Adicionar fotos</h1>
         <p className="mt-1 text-sm text-neutral-500">
-          Envie fotos que capturam seus melhores momentos. Você pode pular esta etapa se preferir.
+          Envie até {MAX_PHOTOS} fotos que capturam seus melhores momentos. Você pode pular esta etapa se preferir.
         </p>
       </div>
 
@@ -127,18 +136,31 @@ export function PhotosForm() {
         onChange={handleFileChange}
       />
 
-      <button
-        onClick={() => fileInputRef.current?.click()}
-        className="flex w-full flex-col items-center gap-3 rounded-xl border border-dashed border-neutral-300 bg-white py-10 text-center hover:border-[#FF4D6D] hover:bg-[#FFF0F3]/20 transition-all"
-      >
-        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#FFF0F3]">
-          <ImagePlus className="h-5 w-5 text-[#FF4D6D]" />
+      {/* Upload button — hidden when at limit */}
+      {!atLimit && (
+        <button
+          onClick={() => fileInputRef.current?.click()}
+          className="flex w-full flex-col items-center gap-3 rounded-xl border border-dashed border-neutral-300 bg-white py-10 text-center hover:border-[#FF4D6D] hover:bg-[#FFF0F3]/20 transition-all"
+        >
+          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#FFF0F3]">
+            <ImagePlus className="h-5 w-5 text-[#FF4D6D]" />
+          </div>
+          <div>
+            <p className="text-sm font-semibold text-neutral-900">Clique para enviar fotos</p>
+            <p className="mt-0.5 text-xs text-neutral-400">
+              JPG, PNG, WebP · Máx. 10MB cada · {remaining} de {MAX_PHOTOS} restantes
+            </p>
+          </div>
+        </button>
+      )}
+
+      {/* Limit reached message */}
+      {atLimit && (
+        <div className="rounded-xl border border-neutral-200 bg-neutral-50 px-5 py-4 text-center">
+          <p className="text-sm font-medium text-neutral-700">Limite de {MAX_PHOTOS} fotos atingido</p>
+          <p className="text-xs text-neutral-400 mt-0.5">Remova uma foto para adicionar outra</p>
         </div>
-        <div>
-          <p className="text-sm font-semibold text-neutral-900">Clique para enviar fotos</p>
-          <p className="mt-0.5 text-xs text-neutral-400">JPG, PNG, WebP · Máx. 10MB cada</p>
-        </div>
-      </button>
+      )}
 
       {(photos.length > 0 || uploading.length > 0) && (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
@@ -150,7 +172,6 @@ export function PhotosForm() {
               {photo.previewUrl ? (
                 <Image src={photo.previewUrl} alt={photo.name} fill className="object-cover" />
               ) : (
-                // Restored from sessionStorage — no blob URL available, show placeholder
                 <div className="flex h-full flex-col items-center justify-center gap-1 bg-neutral-100">
                   <ImageIcon className="h-6 w-6 text-neutral-400" />
                   <p className="px-2 text-center text-xs text-neutral-400 line-clamp-2">{photo.name}</p>

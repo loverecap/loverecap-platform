@@ -476,6 +476,7 @@ export function TimelineForm() {
                     ref={fileInputRef}
                     type="file"
                     accept="image/jpeg,image/png,image/webp"
+                    multiple={false}
                     className="hidden"
                     onChange={handlePhotoSelect}
                   />
