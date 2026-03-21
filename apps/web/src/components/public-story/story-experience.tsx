@@ -16,6 +16,7 @@ import { StoryMoonPhase } from './story-moon-phase'
 import { StoryZodiac } from './story-zodiac'
 import { StoryToday } from './story-today'
 import { StoryStats } from './story-stats'
+import { StorySpinWheel } from './story-spin-wheel'
 import { StoryNarrativeDivider } from './story-narrative-divider'
 import { SectionReveal } from './section-reveal'
 
@@ -186,6 +187,10 @@ export function StoryExperience({
                 musicTrack={musicLabel}
                 photosCount={photoCount > 0 ? photoCount : undefined}
               />
+            </SectionReveal>
+
+            <SectionReveal>
+              <StorySpinWheel />
             </SectionReveal>
 
             <SectionReveal>
