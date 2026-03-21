@@ -2,7 +2,7 @@
 
 import { motion, useReducedMotion } from 'framer-motion'
 import Link from 'next/link'
-import { Check, ArrowRight, Zap, Shield, Heart } from 'lucide-react'
+import { Check, Zap, Shield, Heart } from 'lucide-react'
 import { PageContainer } from '@/components/shared/page-container'
 import { SectionContainer } from '@/components/shared/section-container'
 
@@ -36,9 +36,9 @@ export function PricingSection() {
           transition={{ duration: 0.5 }}
           className="mb-10 text-center"
         >
-          <p className="mb-3 text-sm font-semibold uppercase tracking-widest text-[#FF4D6D]">
-            Preço
-          </p>
+          <div className="mb-3 inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-white" style={{ background: 'linear-gradient(135deg, #FF4D6D, #E8003E)' }}>
+            🔥 Oferta de lançamento
+          </div>
           <h2 className="font-heading text-3xl font-bold text-neutral-900 sm:text-4xl">
             Uma vez só. Para sempre.
           </h2>
@@ -71,9 +71,13 @@ export function PricingSection() {
                 <span>⚡</span> Pagamento único
               </div>
 
-              <div className="mb-1 flex items-baseline gap-1.5">
+              <div className="mb-1 flex items-baseline gap-2">
                 <span className="font-heading text-5xl font-bold text-neutral-900">R$9,99</span>
+                <span className="text-lg text-neutral-400 line-through">R$29,90</span>
               </div>
+              <p className="mb-1 text-sm font-medium text-[#FF4D6D]">
+                67% de desconto — só por tempo limitado
+              </p>
               <p className="mb-6 text-sm text-neutral-400">
                 Pague uma vez · sem assinatura · sem cobranças futuras
               </p>
@@ -101,8 +105,7 @@ export function PricingSection() {
                 }}
               >
                 <Heart className="h-4 w-4 shrink-0 fill-white text-white" />
-                Criar meu LoveRecap
-                <ArrowRight className="h-4 w-4 shrink-0" />
+                Quero fazer isso agora ❤️
               </Link>
             </div>
           </motion.div>

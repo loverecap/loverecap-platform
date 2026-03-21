@@ -30,7 +30,7 @@ import type { BuilderMemory } from '@/contexts/builder-context'
 import { cn } from '@loverecap/utils'
 
 const toTitleCase = (str: string) =>
-  str.split(' ').map((w) => (w ? w.charAt(0).toUpperCase() + w.slice(1) : '')).join(' ')
+  str.split(' ').map((w) => (w ? w.charAt(0).toUpperCase() + w.slice(1).toLowerCase() : '')).join(' ')
 const toSentenceCase = (str: string) => (str ? str.charAt(0).toUpperCase() + str.slice(1) : str)
 
 const MAX_PHOTO_SIZE_MB = 10
@@ -546,6 +546,7 @@ export function TimelineForm() {
                           maxLength={120}
                           {...field}
                           onChange={(e) => field.onChange(toTitleCase(e.target.value))}
+                          onBlur={(e) => { field.onChange(toTitleCase(e.target.value.trim())); field.onBlur() }}
                         />
                       </FormControl>
                       <FormMessage />
@@ -594,6 +595,7 @@ export function TimelineForm() {
                         autoCapitalize="sentences"
                         {...field}
                         onChange={(e) => field.onChange(toSentenceCase(e.target.value))}
+                        onBlur={(e) => { field.onChange(toSentenceCase(e.target.value.trim())); field.onBlur() }}
                       />
                     </FormControl>
                     <p className="text-[11px] text-neutral-400">

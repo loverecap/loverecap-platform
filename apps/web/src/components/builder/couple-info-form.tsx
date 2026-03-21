@@ -14,7 +14,8 @@ import {
 } from '@/components/ui/form'
 import { useBuilder } from '@/contexts/builder-context'
 
-const toTitleCase = (str: string) => str.replace(/\b\w/g, (c) => c.toUpperCase())
+const toTitleCase = (str: string) =>
+  str.split(' ').map((w) => (w ? w.charAt(0).toUpperCase() + w.slice(1).toLowerCase() : '')).join(' ')
 
 const schema = z.object({
   partner_name_1: z.string().min(1, 'Obrigatório').max(60),
@@ -94,7 +95,13 @@ export function CoupleInfoForm() {
                 <FormItem>
                   <FormLabel>Seu nome</FormLabel>
                   <FormControl>
-                    <Input placeholder="Ana" autoCapitalize="words" {...field} onChange={(e) => field.onChange(toTitleCase(e.target.value))} />
+                    <Input
+                      placeholder="Ana"
+                      autoCapitalize="off"
+                      {...field}
+                      onChange={(e) => field.onChange(toTitleCase(e.target.value))}
+                      onBlur={(e) => { field.onChange(toTitleCase(e.target.value.trim())); field.onBlur() }}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -107,7 +114,13 @@ export function CoupleInfoForm() {
                 <FormItem>
                   <FormLabel>Nome do(a) parceiro(a)</FormLabel>
                   <FormControl>
-                    <Input placeholder="Pedro" autoCapitalize="words" {...field} onChange={(e) => field.onChange(toTitleCase(e.target.value))} />
+                    <Input
+                      placeholder="Pedro"
+                      autoCapitalize="off"
+                      {...field}
+                      onChange={(e) => field.onChange(toTitleCase(e.target.value))}
+                      onBlur={(e) => { field.onChange(toTitleCase(e.target.value.trim())); field.onBlur() }}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

@@ -7,6 +7,7 @@ import { HowItWorks } from '@/components/marketing/how-it-works'
 import { Testimonials } from '@/components/marketing/testimonials'
 import { PricingSection } from '@/components/marketing/pricing-section'
 import { FaqSection } from '@/components/marketing/faq-section'
+import { StoryPreview } from '@/components/marketing/story-preview'
 
 const APP_URL = process.env['NEXT_PUBLIC_APP_URL'] ?? 'https://loverecap.app'
 
@@ -55,6 +56,7 @@ export default function HomePage() {
       <main>
         <Hero />
         <SocialProofBar />
+        <StoryPreview />
         <HowItWorks />
         <Testimonials />
         <PricingSection />

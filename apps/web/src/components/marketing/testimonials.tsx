@@ -1,40 +1,42 @@
 'use client'
 
 import { motion, useReducedMotion } from 'framer-motion'
-import { Star } from 'lucide-react'
 import { PageContainer } from '@/components/shared/page-container'
 import { SectionContainer } from '@/components/shared/section-container'
 
-const testimonials = [
+const chats = [
   {
-    name: 'Camila R.',
-    location: 'São Paulo · SP',
-    initials: 'CR',
-    color: '#FF8FA3',
-    stars: 5,
-    highlight: '"Meu namorado chorou 😭"',
-    text: 'Fiz de surpresa no nosso aniversário de 2 anos. Ele ficou tão emocionado que chorou! Nunca vi ele assim. A página ficou linda demais, super fácil de criar.',
-    tag: 'Presente de aniversário',
+    name: 'Camila & Carlos',
+    time: 'Hoje',
+    messages: [
+      { sent: true, text: 'amor… fiz uma coisa pra você 🥹', time: '20:12', ticks: '✓✓' },
+      { sent: true, text: '👉 [link do loverecap]', time: '20:12', ticks: '✓✓', link: true },
+      { sent: false, text: 'amor…', time: '20:14' },
+      { sent: false, text: 'eu tô chorando aqui 😭❤️', time: '20:14' },
+      { sent: false, text: 'nunca recebi nada tão lindo na vida', time: '20:15' },
+    ],
   },
   {
-    name: 'Ricardo A.',
-    location: 'Belo Horizonte · MG',
-    initials: 'RA',
-    color: '#A78BCC',
-    stars: 5,
-    highlight: '"Ela ficou sem palavras 🥹"',
-    text: 'Criei no Dia dos Namorados como surpresa. Minha namorada ficou sem palavras quando abriu. Ela salvou o link nos favoritos do celular e mostra pra todo mundo!',
-    tag: 'Dia dos Namorados',
+    name: 'Marina & João',
+    time: 'Ontem',
+    messages: [
+      { sent: false, text: 'vc fez isso por mim?? 🥹', time: '22:01' },
+      { sent: true, text: 'fiz sim amor, tô te amando demais', time: '22:02', ticks: '✓✓' },
+      { sent: false, text: 'nossa história toda ali… eu tô sem palavra', time: '22:03' },
+      { sent: false, text: 'mandei pra minha mãe ver 😭', time: '22:04' },
+      { sent: true, text: '❤️❤️❤️', time: '22:04', ticks: '✓✓' },
+    ],
   },
   {
-    name: 'Mariana S.',
-    location: 'Rio de Janeiro · RJ',
-    initials: 'MS',
-    color: '#FF6B8A',
-    stars: 5,
-    highlight: '"Melhor R$9,99 que já gastei"',
-    text: 'Mandei o link pra família inteira ver. Todo mundo ficou emocionado com a história de vocês. Valeu imensamente mais do que o preço. Farei de novo no próximo aniversário!',
-    tag: 'Compartilhado com a família',
+    name: 'Fernanda & Rafa',
+    time: 'Sáb.',
+    messages: [
+      { sent: true, text: 'feliz aniversário de 3 anos meu amor 🌹', time: '00:00', ticks: '✓✓' },
+      { sent: true, text: 'olha o que eu fiz pra você ❤️', time: '00:00', ticks: '✓✓', link: true },
+      { sent: false, text: 'RAFA', time: '00:03' },
+      { sent: false, text: 'eu tô tremendo aqui 😭😭', time: '00:03' },
+      { sent: false, text: 'melhor presente que já ganhei na vida inteira', time: '00:04' },
+    ],
   },
 ]
 
@@ -52,57 +54,87 @@ export function Testimonials() {
           className="mb-10 text-center"
         >
           <p className="mb-3 text-sm font-semibold uppercase tracking-widest text-[#FF4D6D]">
-            Histórias reais
+            Reações reais
           </p>
           <h2 className="font-heading text-3xl font-bold text-neutral-900 sm:text-4xl">
-            Já fizeram alguém chorar de felicidade
+            Veja as mensagens que chegaram
           </h2>
           <p className="mt-3 mx-auto max-w-sm text-sm text-neutral-500">
-            Mais de 800 casais já criaram o LoveRecap. Veja o que estão dizendo.
+            Isso é o que acontece quando alguém recebe o link do LoveRecap.
           </p>
         </motion.div>
 
         <div className="grid gap-5 sm:grid-cols-3">
-          {testimonials.map((t, i) => (
+          {chats.map((chat, i) => (
             <motion.div
-              key={t.name}
+              key={chat.name}
               initial={reduce ? {} : { opacity: 0, y: 28 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: i * 0.1 }}
-              className="relative flex flex-col rounded-2xl border border-[#F7E3EB] bg-white p-5 shadow-sm"
             >
-              <div className="mb-3 flex gap-0.5">
-                {[...Array(t.stars)].map((_, j) => (
-                  <Star key={j} className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
-                ))}
-              </div>
-
-              <p className="mb-1 font-heading text-base font-bold text-neutral-900">
-                {t.highlight}
-              </p>
-              <p className="flex-1 text-sm leading-relaxed text-neutral-500">{t.text}</p>
-
-              <div className="mt-4 border-t border-neutral-100 pt-4">
-                <div className="flex items-center gap-2.5">
+              <div
+                className="overflow-hidden rounded-2xl shadow-lg"
+                style={{ background: '#0B141A' }}
+              >
+                {/* WhatsApp header */}
+                <div
+                  className="flex items-center gap-2.5 px-4 py-3"
+                  style={{ background: '#1F2C34' }}
+                >
                   <div
-                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[11px] font-bold text-white"
-                    style={{ background: t.color }}
+                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white"
+                    style={{ background: '#FF4D6D' }}
                   >
-                    {t.initials}
+                    {chat.name.split(' & ')[0]?.[0]}
                   </div>
                   <div>
-                    <p className="text-xs font-semibold text-neutral-800">{t.name}</p>
-                    <p className="text-[10px] text-neutral-400">{t.location}</p>
+                    <p className="text-[12px] font-semibold text-white">{chat.name}</p>
+                    <p className="text-[10px]" style={{ color: '#8696A0' }}>{chat.time}</p>
                   </div>
-                  <span
-                    className="ml-auto rounded-full px-2.5 py-0.5 text-[9.5px] font-semibold"
-                    style={{ background: '#FFF0F3', color: '#FF4D6D' }}
-                  >
-                    {t.tag}
-                  </span>
+                  <div className="ml-auto flex gap-4">
+                    <div className="h-4 w-4 rounded-full" style={{ background: '#1F2C34' }} />
+                    <div className="h-4 w-4 rounded-full" style={{ background: '#1F2C34' }} />
+                  </div>
+                </div>
+
+                {/* Messages */}
+                <div className="space-y-1.5 px-3 py-4">
+                  {chat.messages.map((msg, j) => (
+                    <div
+                      key={j}
+                      className={`flex ${msg.sent ? 'justify-end' : 'justify-start'}`}
+                    >
+                      <div
+                        className="max-w-[80%] rounded-xl px-3 py-1.5"
+                        style={{
+                          background: msg.sent ? '#005C4B' : '#202C33',
+                          borderRadius: msg.sent
+                            ? '12px 12px 2px 12px'
+                            : '12px 12px 12px 2px',
+                        }}
+                      >
+                        <p
+                          className="text-[11px] leading-snug"
+                          style={{
+                            color: msg.link ? '#53BDEB' : '#E9EDEF',
+                            textDecoration: msg.link ? 'underline' : 'none',
+                          }}
+                        >
+                          {msg.text}
+                        </p>
+                        <p className="mt-0.5 text-right text-[9px]" style={{ color: '#8696A0' }}>
+                          {msg.time}
+                          {msg.ticks && (
+                            <span className="ml-0.5" style={{ color: '#53BDEB' }}>{msg.ticks}</span>
+                          )}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
+              <p className="mt-2 text-center text-xs text-neutral-400">{chat.name.split(' & ')[0]} fez para o(a) parceiro(a)</p>
             </motion.div>
           ))}
         </div>
