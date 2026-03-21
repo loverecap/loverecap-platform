@@ -214,9 +214,9 @@ export function TimelineForm() {
             ? {
                 ...m,
                 title: values.title,
-                short_description: values.short_description || undefined,
-                description: values.description || undefined,
-                occurred_at: values.occurred_at || undefined,
+                ...(values.short_description ? { short_description: values.short_description } : {}),
+                ...(values.description ? { description: values.description } : {}),
+                ...(values.occurred_at ? { occurred_at: values.occurred_at } : {}),
                 emoji: values.emoji,
               }
             : m,

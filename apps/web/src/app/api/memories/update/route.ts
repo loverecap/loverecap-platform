@@ -22,7 +22,17 @@ export async function PATCH(request: NextRequest) {
     const parsed = updateMemorySchema.safeParse(body)
     if (!parsed.success) return validationError(parsed.error)
 
-    const { memory_id, ...updates } = parsed.data
+    const { memory_id, ...rawUpdates } = parsed.data
+    const updates = Object.fromEntries(
+      Object.entries(rawUpdates).filter(([, v]) => v !== undefined),
+    ) as {
+      title?: string
+      short_description?: string | null
+      description?: string | null
+      occurred_at?: string
+      emoji?: string | null
+      position?: number
+    }
 
     const memory = await getMemoryById(supabase, memory_id).catch(
       (e: { code?: string }) => {

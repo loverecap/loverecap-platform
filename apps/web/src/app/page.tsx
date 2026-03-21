@@ -2,8 +2,9 @@ import type { Metadata } from 'next'
 import { Nav } from '@/components/shared/nav'
 import { Footer } from '@/components/marketing/footer'
 import { Hero } from '@/components/marketing/hero'
+import { SocialProofBar } from '@/components/marketing/social-proof-bar'
 import { HowItWorks } from '@/components/marketing/how-it-works'
-import { Benefits } from '@/components/marketing/benefits'
+import { Testimonials } from '@/components/marketing/testimonials'
 import { PricingSection } from '@/components/marketing/pricing-section'
 import { FaqSection } from '@/components/marketing/faq-section'
 
@@ -53,8 +54,9 @@ export default function HomePage() {
       <Nav />
       <main>
         <Hero />
+        <SocialProofBar />
         <HowItWorks />
-        <Benefits />
+        <Testimonials />
         <PricingSection />
         <FaqSection />
       </main>
