@@ -103,12 +103,26 @@ export function StorySpinWheel() {
 
   return (
     <section
-      className="relative overflow-hidden py-16 px-5"
-      style={{ background: 'linear-gradient(180deg, #1C0A12 0%, #100409 100%)' }}
+      className="relative overflow-hidden pt-28 pb-28 px-5"
+      style={{
+        background:
+          'linear-gradient(180deg,' +
+          '#FFF8F2 0%,' +
+          '#F2D0DC 5%,' +
+          '#7A1830 12%,' +
+          '#2A0A14 18%,' +
+          '#1C0A12 28%,' +
+          '#100409 55%,' +
+          '#1C0A12 72%,' +
+          '#2A0A14 82%,' +
+          '#7A1830 88%,' +
+          '#F2D0DC 95%,' +
+          '#FFF8F2 100%)',
+      }}
     >
-      {/* Ambient pink glow top */}
+      {/* Ambient pink glow center */}
       <div
-        className="pointer-events-none absolute -top-16 left-1/2 -translate-x-1/2 h-64 w-64 rounded-full opacity-25"
+        className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-64 w-64 rounded-full opacity-20"
         style={{ background: 'radial-gradient(ellipse, #FF4D6D 0%, transparent 70%)' }}
       />
 
