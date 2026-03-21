@@ -57,6 +57,7 @@ export function TimelineForm() {
   const [isAdding, setIsAdding] = useState(state.memories.length === 0)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [isSaving, setIsSaving] = useState(false)
+  const [deletingId, setDeletingId] = useState<string | null>(null)
   const [pendingPhoto, setPendingPhoto] = useState<{ file: File; previewUrl: string } | null>(null)
   const [isFileDragging, setIsFileDragging] = useState(false)
   const [dragIndex, setDragIndex] = useState<number | null>(null)
@@ -102,6 +103,26 @@ export function TimelineForm() {
     setEditingId(null)
     setPendingPhoto(null)
     form.reset()
+  }
+
+  async function handleDeleteMemory(memoryId: string) {
+    setDeletingId(memoryId)
+    try {
+      const res = await fetch('/api/memories/delete', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ memory_id: memoryId }),
+      })
+      const json = await res.json() as { error?: { message: string } }
+      if (!res.ok || json.error) throw new Error(json.error?.message ?? 'Erro ao remover memória')
+
+      dispatch({ type: 'REMOVE_MEMORY', payload: memoryId })
+      toast.success('Memória removida!')
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Erro ao remover memória')
+    } finally {
+      setDeletingId(null)
+    }
   }
 
   function handlePhotoFile(file: File) {
@@ -381,18 +402,23 @@ export function TimelineForm() {
 
               <button
                 onClick={() => startEditing(memory)}
-                className="shrink-0 text-neutral-300 hover:text-[#FF4D6D] transition-colors"
+                disabled={deletingId === memory.id}
+                className="shrink-0 flex h-7 w-7 items-center justify-center rounded-lg bg-[#FFF0F3] text-[#FF4D6D] transition-colors hover:bg-[#FF4D6D] hover:text-white disabled:opacity-40"
                 aria-label="Editar memória"
               >
-                <Pencil className="h-4 w-4" />
+                <Pencil className="h-3.5 w-3.5" />
               </button>
 
               <button
-                onClick={() => dispatch({ type: 'REMOVE_MEMORY', payload: memory.id })}
-                className="shrink-0 text-neutral-300 hover:text-red-400 transition-colors"
+                onClick={() => void handleDeleteMemory(memory.id)}
+                disabled={deletingId === memory.id}
+                className="shrink-0 flex h-7 w-7 items-center justify-center rounded-lg bg-red-50 text-red-400 transition-colors hover:bg-red-500 hover:text-white disabled:opacity-40"
                 aria-label="Remover memória"
               >
-                <Trash2 className="h-4 w-4" />
+                {deletingId === memory.id
+                  ? <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  : <Trash2 className="h-3.5 w-3.5" />
+                }
               </button>
             </div>
           ))}

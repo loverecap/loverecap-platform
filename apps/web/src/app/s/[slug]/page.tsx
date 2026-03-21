@@ -3,6 +3,11 @@ import type { Metadata } from 'next'
 import { getProjectBySlug, createAdminClient } from '@loverecap/database'
 import { StoryExperience } from '@/components/public-story/story-experience'
 
+// Cache story pages for 5 minutes at the CDN edge.
+// Signed URLs are valid for 1 year, so this is safe.
+// Reduces serverless invocations dramatically for popular stories.
+export const revalidate = 300
+
 interface StoryPageProps {
   params: Promise<{ slug: string }>
 }

@@ -69,6 +69,7 @@ type BuilderAction =
   | { type: 'ADD_MEMORY'; payload: Memory }
   | { type: 'REMOVE_MEMORY'; payload: string }
   | { type: 'SET_MEMORIES'; payload: Memory[] }
+  | { type: 'ADD_UPLOADED_PHOTO'; payload: UploadedPhoto }
   | { type: 'SET_UPLOADED_PHOTOS'; payload: UploadedPhoto[] }
   | { type: 'SET_FINAL_MESSAGE'; payload: string }
   | { type: 'SET_LOADING'; payload: boolean }
@@ -134,6 +135,8 @@ function builderReducer(state: BuilderState, action: BuilderAction): BuilderStat
       return { ...state, memories: state.memories.filter((m) => m.id !== action.payload) }
     case 'SET_MEMORIES':
       return { ...state, memories: action.payload }
+    case 'ADD_UPLOADED_PHOTO':
+      return { ...state, uploadedPhotos: [...state.uploadedPhotos, action.payload] }
     case 'SET_UPLOADED_PHOTOS':
       return { ...state, uploadedPhotos: action.payload }
     case 'SET_FINAL_MESSAGE':

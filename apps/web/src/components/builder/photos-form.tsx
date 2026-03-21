@@ -1,11 +1,10 @@
 'use client'
 
-import { useRef, useEffect } from 'react'
+import { useRef, useEffect, useState } from 'react'
 import { ImagePlus, X, Loader2, ArrowRight, ArrowLeft, Image as ImageIcon } from 'lucide-react'
 import { toast } from 'sonner'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { useBuilder } from '@/contexts/builder-context'
 
@@ -17,6 +16,7 @@ export function PhotosForm() {
   const { state, dispatch } = useBuilder()
   const router = useRouter()
   const [uploading, setUploading] = useState<string[]>([])
+  const [deleting, setDeleting] = useState<string[]>([])
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
@@ -34,11 +34,6 @@ export function PhotosForm() {
   async function uploadFile(file: File) {
     if (!state.projectId) {
       toast.error('Projeto não encontrado. Por favor, volte.')
-      return
-    }
-
-    if (photos.length + uploading.length >= MAX_PHOTOS) {
-      toast.error(`Limite de ${MAX_PHOTOS} fotos atingido.`)
       return
     }
 
@@ -86,12 +81,11 @@ export function PhotosForm() {
       if (!uploadRes.ok) throw new Error('Erro ao enviar. Tente novamente.')
 
       const previewUrl = URL.createObjectURL(file)
+      // Use ADD_UPLOADED_PHOTO to atomically append — avoids stale closure when
+      // multiple files are uploaded concurrently via forEach
       dispatch({
-        type: 'SET_UPLOADED_PHOTOS',
-        payload: [
-          ...state.uploadedPhotos,
-          { assetId: asset_id, storagePath: storage_path, previewUrl, name: file.name },
-        ],
+        type: 'ADD_UPLOADED_PHOTO',
+        payload: { assetId: asset_id, storagePath: storage_path, previewUrl, name: file.name },
       })
       toast.success('Foto enviada!')
     } catch (err) {
@@ -107,11 +101,26 @@ export function PhotosForm() {
     e.target.value = ''
   }
 
-  function removePhoto(assetId: string) {
-    dispatch({
-      type: 'SET_UPLOADED_PHOTOS',
-      payload: state.uploadedPhotos.filter((p) => p.assetId !== assetId),
-    })
+  async function removePhoto(assetId: string) {
+    setDeleting((prev) => [...prev, assetId])
+    try {
+      const res = await fetch('/api/uploads/delete', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ asset_id: assetId }),
+      })
+      const json = await res.json() as { error?: { message: string } }
+      if (!res.ok || json.error) throw new Error(json.error?.message ?? 'Erro ao remover')
+
+      dispatch({
+        type: 'SET_UPLOADED_PHOTOS',
+        payload: state.uploadedPhotos.filter((p) => p.assetId !== assetId),
+      })
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Erro ao remover foto')
+    } finally {
+      setDeleting((prev) => prev.filter((id) => id !== assetId))
+    }
   }
 
   const isBusy = uploading.length > 0
@@ -160,28 +169,37 @@ export function PhotosForm() {
 
       {(photos.length > 0 || uploading.length > 0) && (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-          {photos.map((photo) => (
-            <div
-              key={photo.assetId}
-              className="group relative aspect-square overflow-hidden rounded-xl border border-neutral-200"
-            >
-              {photo.previewUrl ? (
-                <Image src={photo.previewUrl} alt={photo.name} fill className="object-cover" />
-              ) : (
-                <div className="flex h-full flex-col items-center justify-center gap-1 bg-neutral-100">
-                  <ImageIcon className="h-6 w-6 text-neutral-400" />
-                  <p className="px-2 text-center text-xs text-neutral-400 line-clamp-2">{photo.name}</p>
-                </div>
-              )}
-              <button
-                onClick={() => removePhoto(photo.assetId)}
-                className="absolute right-1.5 top-1.5 flex h-6 w-6 items-center justify-center rounded-full bg-black/50 text-white opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity"
-                aria-label="Remover foto"
+          {photos.map((photo) => {
+            const isDeleting = deleting.includes(photo.assetId)
+            return (
+              <div
+                key={photo.assetId}
+                className="group relative aspect-square overflow-hidden rounded-xl border border-neutral-200"
               >
-                <X className="h-3.5 w-3.5" />
-              </button>
-            </div>
-          ))}
+                {photo.previewUrl ? (
+                  <Image src={photo.previewUrl} alt={photo.name} fill className="object-cover" unoptimized />
+                ) : (
+                  <div className="flex h-full flex-col items-center justify-center gap-1 bg-neutral-100">
+                    <ImageIcon className="h-6 w-6 text-neutral-400" />
+                    <p className="px-2 text-center text-xs text-neutral-400 line-clamp-2">{photo.name}</p>
+                  </div>
+                )}
+                {isDeleting && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/40">
+                    <Loader2 className="h-5 w-5 animate-spin text-white" />
+                  </div>
+                )}
+                <button
+                  onClick={() => void removePhoto(photo.assetId)}
+                  disabled={isDeleting}
+                  className="absolute right-1.5 top-1.5 flex h-6 w-6 items-center justify-center rounded-full bg-black/50 text-white opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity disabled:opacity-50"
+                  aria-label="Remover foto"
+                >
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              </div>
+            )
+          })}
           {uploading.map((name) => (
             <div
               key={name}
