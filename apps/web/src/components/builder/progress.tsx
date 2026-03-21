@@ -10,7 +10,18 @@ interface BuilderProgressProps {
   onStepClick?: (step: BuilderStep) => void
 }
 
+const STEP_EMOTIONAL: Record<BuilderStep, string> = {
+  info: 'Quem vai se emocionar? 💑',
+  timeline: 'Adicione os momentos ✨',
+  photos: 'Fotos que marcaram tudo 📸',
+  message: 'As palavras certas 💌',
+  music: 'A trilha sonora de vocês 🎵',
+  review: 'Tudo pronto para emocionar 🥹',
+}
+
 export function BuilderProgress({ currentStep, completedSteps, onStepClick }: BuilderProgressProps) {
+  const currentIndex = BUILDER_STEPS.indexOf(currentStep)
+
   return (
     <nav aria-label="Builder progress" className="w-full">
       <ol className="flex items-center justify-between gap-1 sm:gap-2">
@@ -65,6 +76,10 @@ export function BuilderProgress({ currentStep, completedSteps, onStepClick }: Bu
           )
         })}
       </ol>
+
+      <p className="mt-2.5 text-center text-[11px] text-neutral-400">
+        Etapa {currentIndex + 1} de {BUILDER_STEPS.length} · {STEP_EMOTIONAL[currentStep]}
+      </p>
     </nav>
   )
 }

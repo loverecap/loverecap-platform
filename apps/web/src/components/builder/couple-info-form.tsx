@@ -39,7 +39,10 @@ export function CoupleInfoForm() {
     },
   })
 
-  const { formState: { isSubmitting } } = form
+  const { formState: { isSubmitting }, watch } = form
+  const name1 = watch('partner_name_1')
+  const name2 = watch('partner_name_2')
+  const showEmotional = name1.trim().length > 1 && name2.trim().length > 1
 
   async function onSubmit(values: FormValues) {
     dispatch({ type: 'SET_ERROR', payload: null })
@@ -127,6 +130,20 @@ export function CoupleInfoForm() {
               )}
             />
           </div>
+
+          {showEmotional && (
+            <div
+              className="rounded-2xl border px-4 py-3 text-center"
+              style={{ background: '#FFF0F3', borderColor: '#F7E3EB' }}
+            >
+              <p className="text-sm font-bold text-neutral-900">
+                {name1.trim()} & {name2.trim()} ❤️
+              </p>
+              <p className="mt-0.5 text-xs text-neutral-500">
+                Isso já está ficando especial…
+              </p>
+            </div>
+          )}
 
           <FormField
             control={form.control}

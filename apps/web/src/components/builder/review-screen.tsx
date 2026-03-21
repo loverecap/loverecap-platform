@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Heart, ArrowLeft, Check, Lock, Sparkles, CheckCircle2, Loader2 } from 'lucide-react'
+import { Heart, ArrowLeft, Check, Lock, CheckCircle2, Loader2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { useBuilder } from '@/contexts/builder-context'
@@ -50,26 +50,35 @@ export function ReviewScreen() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="font-heading text-2xl font-bold text-neutral-900">Sua história está pronta</h1>
+        <h1 className="font-heading text-2xl font-bold text-neutral-900">
+          Sua história está pronta 🥹
+        </h1>
         <p className="mt-1 text-sm text-neutral-500">
-          Publique agora para guardar esse momento para sempre.
+          Isso ficou lindo demais. Publique agora para nunca perder esse momento.
         </p>
       </div>
 
       {state.info && (
         <div className="relative overflow-hidden rounded-2xl shadow-lg border border-[#FF4D6D]/20">
-          
+          {/* Blurred story preview */}
           <div
             className="select-none pointer-events-none"
             style={{ filter: 'blur(3.5px)', transform: 'scale(1.02)', transformOrigin: 'center' }}
           >
-            <div className="bg-linear-to-br from-[#FF4D6D] to-[#FF8FA3] px-6 pt-10 pb-8 text-center text-white">
-              <div className="text-4xl mb-3">{state.memories[0]?.emoji ?? '❤️'}</div>
-              <h2 className="font-heading text-xl font-bold mb-1">
-                {state.info.partner_name_1} &amp; {state.info.partner_name_2}
+            <div
+              className="relative flex flex-col items-center justify-center px-6 pt-10 pb-8 text-center text-white"
+              style={{ background: 'linear-gradient(158deg, #FF4D6D 0%, #E8003E 48%, #C9184A 100%)' }}
+            >
+              <div
+                className="absolute inset-0 opacity-10"
+                style={{ backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)', backgroundSize: '20px 20px' }}
+              />
+              <div className="relative text-3xl mb-2">{state.memories[0]?.emoji ?? '❤️'}</div>
+              <h2 className="relative font-heading text-xl font-bold mb-1">
+                {state.info.partner_name_1} & {state.info.partner_name_2}
               </h2>
               {state.info.relationship_start_date && (
-                <p className="text-white/75 text-sm">
+                <p className="relative text-white/75 text-sm">
                   Juntos desde {formatDate(state.info.relationship_start_date)}
                 </p>
               )}
@@ -97,6 +106,7 @@ export function ReviewScreen() {
             </div>
           </div>
 
+          {/* Lock overlay */}
           <div className="absolute inset-0 flex items-center justify-center bg-white/25 backdrop-blur-[1.5px]">
             <div className="mx-6 w-full max-w-xs rounded-2xl bg-white/95 px-6 py-5 text-center shadow-2xl border border-neutral-100">
               <div className="mb-3 flex justify-center">
@@ -115,13 +125,32 @@ export function ReviewScreen() {
         </div>
       )}
 
+      {/* Emotional reinforcement */}
+      <div
+        className="rounded-2xl px-5 py-4 text-center"
+        style={{ background: '#FFF0F3', border: '1px solid #F7E3EB' }}
+      >
+        <p className="text-sm font-semibold text-neutral-800">
+          Essa não é só uma página…
+        </p>
+        <p className="mt-1 text-sm text-neutral-500">
+          É uma memória que {state.info?.partner_name_1 && state.info.partner_name_2
+            ? `${state.info.partner_name_1} e ${state.info.partner_name_2}`
+            : 'vocês'} vão guardar para sempre ❤️
+        </p>
+      </div>
+
+      {/* Pricing card */}
       {state.info && (
         <div className="rounded-xl border border-neutral-200 bg-neutral-50 p-5">
           <div className="flex items-baseline justify-between mb-1">
             <span className="text-sm font-semibold text-neutral-900">LoveRecap</span>
             <div className="text-right">
-              <span className="font-heading text-2xl font-bold text-neutral-900">R$9,99</span>
-              <p className="text-[11px] text-neutral-400">pagamento único · sem mensalidade</p>
+              <div className="flex items-baseline gap-2">
+                <span className="font-heading text-2xl font-bold text-neutral-900">R$9,99</span>
+                <span className="text-sm text-neutral-400 line-through">R$29,90</span>
+              </div>
+              <p className="text-[11px] font-medium text-[#FF4D6D]">oferta de lançamento</p>
             </div>
           </div>
           <ul className="space-y-1.5 mt-3">
@@ -137,7 +166,7 @@ export function ReviewScreen() {
             ))}
           </ul>
           <p className="mt-3 text-[11px] text-neutral-400 text-center border-t border-neutral-200 pt-3">
-            Se você não publicar agora, sua história fica apenas como rascunho.
+            Pagamento único · sem mensalidade · sem cobranças futuras
           </p>
         </div>
       )}
@@ -156,18 +185,20 @@ export function ReviewScreen() {
           />
         </div>
       ) : (
-        
         <div className="flex flex-col gap-3">
-          <Button
-            size="lg"
-            className="w-full h-14 text-base"
+          <button
             onClick={() => setShowPix(true)}
+            className="flex h-14 w-full items-center justify-center gap-2.5 rounded-full text-[15px] font-semibold text-white transition-transform active:scale-[0.97]"
+            style={{
+              background: 'linear-gradient(135deg, #FF4D6D 0%, #E8003E 100%)',
+              boxShadow: '0 8px 28px rgba(255,77,109,0.44), 0 2px 6px rgba(255,77,109,0.2)',
+            }}
           >
-            <Sparkles className="h-4 w-4 shrink-0" />
-            Guardar esta história — R$9,99
-          </Button>
+            <Heart className="h-4 w-4 shrink-0 fill-white text-white" />
+            Quero guardar essa memória ❤️
+          </button>
           <p className="text-center text-[11px] text-neutral-400">
-            Sem mensalidade · fica online para sempre
+            Pagamento único R$9,99 · fica online para sempre
           </p>
           <Button
             type="button"
