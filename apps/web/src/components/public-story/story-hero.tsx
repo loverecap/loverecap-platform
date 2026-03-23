@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { motion, useReducedMotion } from 'framer-motion'
+import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion'
 import { Heart, Calendar, ChevronDown } from 'lucide-react'
 import { formatDate } from '@loverecap/utils'
 
@@ -75,6 +75,10 @@ export function StoryHero({ partnerName1, partnerName2, startDate, coverUrl }: S
   const [metrics, setMetrics] = useState<Metrics>({ days: 0, hours: 0, minutes: 0 })
   const [mounted, setMounted] = useState(false)
 
+  const { scrollY } = useScroll()
+  const bgY = useTransform(scrollY, [0, 700], [0, 200])
+  const blobY = useTransform(scrollY, [0, 700], [0, 80])
+
   useEffect(() => {
     setMounted(true)
     setMetrics(computeMetrics(startDate))
@@ -105,21 +109,23 @@ export function StoryHero({ partnerName1, partnerName2, startDate, coverUrl }: S
       
       {hasCover && coverUrl && (
         <>
-          <div
-            className="absolute inset-0 bg-cover bg-center scale-105"
-            style={{ backgroundImage: `url(${coverUrl})` }}
+          <motion.div
+            className="absolute inset-0 bg-cover bg-center scale-110"
+            style={{ backgroundImage: `url(${coverUrl})`, y: reduce ? 0 : bgY }}
           />
           <div className="absolute inset-0 bg-linear-to-b from-black/30 via-black/35 to-black/65" />
         </>
       )}
 
       {!hasCover && (
-        <>
-          <div className="absolute top-0 right-0 w-80 h-80 rounded-full bg-[#F8C8DC]/35 -translate-y-1/2 translate-x-1/3 blur-3xl pointer-events-none" />
-          
-          <div className="absolute bottom-0 left-0 w-72 h-72 rounded-full bg-[#FFE0E8]/22 -translate-x-1/3 -translate-y-1/4 blur-3xl pointer-events-none" />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 rounded-full bg-[#FFF0F3]/60 blur-3xl pointer-events-none" />
-        </>
+        <motion.div
+          className="pointer-events-none absolute inset-0"
+          style={{ y: reduce ? 0 : blobY }}
+        >
+          <div className="absolute top-0 right-0 w-80 h-80 rounded-full bg-[#F8C8DC]/35 -translate-y-1/2 translate-x-1/3 blur-3xl" />
+          <div className="absolute bottom-0 left-0 w-72 h-72 rounded-full bg-[#FFE0E8]/22 -translate-x-1/3 -translate-y-1/4 blur-3xl" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 rounded-full bg-[#FFF0F3]/60 blur-3xl" />
+        </motion.div>
       )}
 
       {hasCover && (

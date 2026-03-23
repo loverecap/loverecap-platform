@@ -223,6 +223,7 @@ export type Database = {
           cover_asset_id: string | null
           final_message: string | null
           published_at: string | null
+          view_count: number
           created_at: string
           updated_at: string
         }
@@ -239,6 +240,7 @@ export type Database = {
           cover_asset_id?: string | null
           final_message?: string | null
           published_at?: string | null
+          view_count?: number
           created_at?: string
           updated_at?: string
         }
@@ -255,6 +257,7 @@ export type Database = {
           cover_asset_id?: string | null
           final_message?: string | null
           published_at?: string | null
+          view_count?: number
           created_at?: string
           updated_at?: string
         }
@@ -275,6 +278,37 @@ export type Database = {
             foreignKeyName: 'projects_cover_asset_id_fkey'
             columns: ['cover_asset_id']
             referencedRelation: 'assets'
+            referencedColumns: ['id']
+          },
+        ]
+      }
+      story_reactions: {
+        Row: {
+          id: string
+          project_id: string
+          emoji: string
+          count: number
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          project_id: string
+          emoji: string
+          count?: number
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          project_id?: string
+          emoji?: string
+          count?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'story_reactions_project_id_fkey'
+            columns: ['project_id']
+            referencedRelation: 'projects'
             referencedColumns: ['id']
           },
         ]

@@ -226,6 +226,8 @@ export default async function StoryPage({ params }: StoryPageProps) {
   } catch {
   }
 
+  const initialViewCount = (project as { view_count?: number }).view_count ?? 0
+
   const appUrl = process.env['NEXT_PUBLIC_APP_URL'] ?? 'https://loverecap.app'
 
   const jsonLd = {
@@ -262,6 +264,8 @@ export default async function StoryPage({ params }: StoryPageProps) {
       music={musicProp}
       hiddenSurprises={hiddenSurprises}
       futureMessage={futureProp}
+      slug={slug}
+      initialViewCount={initialViewCount}
     />
     </>
   )

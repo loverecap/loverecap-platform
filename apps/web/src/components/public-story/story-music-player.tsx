@@ -11,6 +11,7 @@ interface StoryMusicPlayerProps {
   videoId: string | null | undefined
   thumbnail: string | null | undefined
   audioUrl: string | null | undefined
+  autoPlay?: boolean
 }
 
 const BAR_HEIGHTS = [0.5, 1.0, 0.65, 0.85, 0.55, 0.75, 0.45]
@@ -52,11 +53,13 @@ function YouTubeMusicPlayer({
   trackTitle,
   artistName,
   thumbnail,
+  autoPlay,
 }: {
   videoId: string
   trackTitle: string
   artistName: string | null | undefined
   thumbnail: string | null | undefined
+  autoPlay?: boolean
 }) {
   const iframeRef = useRef<HTMLIFrameElement | null>(null)
   const [playing, setPlaying] = useState(false)
@@ -67,6 +70,9 @@ function YouTubeMusicPlayer({
       if (typeof e.data !== 'string') return
       try {
         const data = JSON.parse(e.data) as { event?: string; info?: number }
+        if (data.event === 'onReady' && autoPlay && !reduce) {
+          sendYT(iframeRef.current, 'playVideo')
+        }
         if (data.event === 'onStateChange') {
           setPlaying(data.info === 1)
         }
@@ -74,7 +80,8 @@ function YouTubeMusicPlayer({
     }
     window.addEventListener('message', onMessage)
     return () => window.removeEventListener('message', onMessage)
-  }, [])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoPlay, reduce])
 
   function handleIframeLoad() {
     iframeRef.current?.contentWindow?.postMessage(
@@ -244,10 +251,12 @@ function LegacyAudioPlayer({
   audioUrl,
   trackTitle,
   artistName,
+  autoPlay,
 }: {
   audioUrl: string
   trackTitle: string
   artistName: string | null | undefined
+  autoPlay?: boolean
 }) {
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const [playing, setPlaying] = useState(false)
@@ -258,8 +267,11 @@ function LegacyAudioPlayer({
     audio.loop = true
     audio.volume = 0.35
     audioRef.current = audio
+    if (autoPlay && !reduce) {
+      audio.play().then(() => setPlaying(true)).catch(() => {})
+    }
     return () => { audio.pause(); audio.src = '' }
-  }, [audioUrl])
+  }, [audioUrl]) // eslint-disable-line react-hooks/exhaustive-deps
 
   function toggle() {
     const audio = audioRef.current
@@ -319,6 +331,7 @@ export function StoryMusicPlayer({
   videoId,
   thumbnail,
   audioUrl,
+  autoPlay,
 }: StoryMusicPlayerProps) {
   return (
     <section
@@ -342,12 +355,14 @@ export function StoryMusicPlayer({
           trackTitle={trackTitle}
           artistName={artistName}
           thumbnail={thumbnail}
+          {...(autoPlay ? { autoPlay } : {})}
         />
       ) : audioUrl ? (
         <LegacyAudioPlayer
           audioUrl={audioUrl}
           trackTitle={trackTitle}
           artistName={artistName}
+          {...(autoPlay ? { autoPlay } : {})}
         />
       ) : null}
     </section>

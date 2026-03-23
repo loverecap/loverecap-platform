@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import Link from 'next/link'
 import { ArrowRight, Heart } from 'lucide-react'
@@ -19,6 +19,10 @@ import { StoryStats } from './story-stats'
 import { StorySpinWheel } from './story-spin-wheel'
 import { StoryNarrativeDivider } from './story-narrative-divider'
 import { SectionReveal } from './section-reveal'
+import { StoryViewCounter } from './story-view-counter'
+import { StoryReactions } from './story-reactions'
+import { StoryCuriosidades } from './story-curiosidades'
+import { StoryAnniversary } from './story-anniversary'
 
 interface Asset {
   id: string
@@ -74,6 +78,61 @@ interface StoryExperienceProps {
   music?: Music | null
   hiddenSurprises?: HiddenSurprise[]
   futureMessage?: FutureMessage | null
+  slug?: string
+  initialViewCount?: number
+}
+
+function StoryFloatingCTA({ hidden }: { hidden: boolean }) {
+  const [visible, setVisible] = useState(false)
+  const reduce = useReducedMotion()
+
+  useEffect(() => {
+    function onScroll() {
+      const scrolled = window.scrollY
+      const total = document.body.scrollHeight - window.innerHeight
+      if (total <= 0) return
+      const progress = scrolled / total
+      setVisible(progress > 0.3 && progress < 0.88)
+    }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
+  return (
+    <AnimatePresence>
+      {visible && !hidden && (
+        <motion.div
+          initial={{ opacity: 0, y: 20, scale: 0.95 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: 20, scale: 0.95 }}
+          transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+          className="fixed bottom-20 left-1/2 -translate-x-1/2 z-40"
+        >
+          <Link
+            href="/create"
+            className="flex items-center gap-2 text-white text-sm font-semibold px-6 py-3.5 rounded-full whitespace-nowrap"
+            style={{
+              background: 'linear-gradient(135deg, #FF4D6D 0%, #FF2E63 100%)',
+              boxShadow: '0 8px 28px rgba(255,77,109,0.50), 0 2px 8px rgba(0,0,0,0.12)',
+            }}
+          >
+            <Heart className="h-4 w-4 fill-white text-white shrink-0" />
+            Criar a minha
+            {!reduce && (
+              <motion.span
+                animate={{ x: [0, 3, 0] }}
+                transition={{ duration: 1.4, repeat: Infinity, ease: 'easeInOut' }}
+                className="flex"
+              >
+                <ArrowRight className="h-4 w-4 shrink-0" />
+              </motion.span>
+            )}
+            {reduce && <ArrowRight className="h-4 w-4 shrink-0" />}
+          </Link>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  )
 }
 
 export function StoryExperience({
@@ -91,6 +150,8 @@ export function StoryExperience({
   music,
   hiddenSurprises = [],
   futureMessage,
+  slug = '',
+  initialViewCount = 0,
 }: StoryExperienceProps) {
   const [started, setStarted] = useState(false)
   const [lightboxOpen, setLightboxOpen] = useState(false)
@@ -126,12 +187,22 @@ export function StoryExperience({
             className="pb-20 bg-[#FFF8F2]"
           >
             
+            <StoryAnniversary
+              startDate={startDate}
+              name1={partnerName1}
+              name2={partnerName2}
+            />
+
             <StoryHero
               partnerName1={partnerName1}
               partnerName2={partnerName2}
               startDate={startDate}
               coverUrl={coverUrl}
             />
+
+            {slug && (
+              <StoryViewCounter slug={slug} initialCount={initialViewCount} />
+            )}
 
             {music && (
               <SectionReveal>
@@ -142,6 +213,7 @@ export function StoryExperience({
                   videoId={music.videoId}
                   thumbnail={music.thumbnail}
                   audioUrl={music.audioUrl}
+                  autoPlay
                 />
               </SectionReveal>
             )}
@@ -181,6 +253,14 @@ export function StoryExperience({
             </SectionReveal>
 
             <SectionReveal>
+              <StoryCuriosidades
+                startDate={startDate}
+                name1={partnerName1}
+                name2={partnerName2}
+              />
+            </SectionReveal>
+
+            <SectionReveal>
               <StoryStats
                 startDate={startDate}
                 memoriesCount={memories.length}
@@ -207,6 +287,12 @@ export function StoryExperience({
                   revealAt={futureMessage.revealAt}
                   hintText={futureMessage.hintText}
                 />
+              </SectionReveal>
+            )}
+
+            {slug && (
+              <SectionReveal>
+                <StoryReactions slug={slug} />
               </SectionReveal>
             )}
 
@@ -300,6 +386,7 @@ export function StoryExperience({
         )}
       </AnimatePresence>
 
+      {started && <StoryFloatingCTA hidden={lightboxOpen} />}
       {started && shareUrl && <StoryShareBar url={shareUrl} title={shareTitle} isHidden={lightboxOpen} />}
     </>
   )
