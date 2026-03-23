@@ -367,13 +367,12 @@ export function PixPayment({ projectId, onSuccess }: PixPaymentProps) {
 
         {IS_DEV && (
           <Button
-            variant="outline"
             size="sm"
-            className="w-full border-dashed border-yellow-400 text-yellow-700 hover:bg-yellow-50"
+            className="w-full bg-emerald-500 text-white hover:bg-emerald-600"
             onClick={handleSimulate}
           >
             <Zap className="h-3.5 w-3.5" />
-            [DEV] Simular pagamento
+            Testar grátis — modo demonstração
           </Button>
         )}
       </div>
