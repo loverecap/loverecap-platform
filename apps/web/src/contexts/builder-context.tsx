@@ -1,6 +1,7 @@
 'use client'
 
 import React, { createContext, useContext, useReducer, useCallback, useEffect } from 'react'
+import { toast } from 'sonner'
 
 export type BuilderStep = 'info' | 'timeline' | 'photos' | 'message' | 'music' | 'review'
 
@@ -172,9 +173,53 @@ export function BuilderProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const saved = readPersistedState()
-    if (saved.projectId ?? saved.info ?? saved.memories?.length ?? saved.uploadedPhotos?.length) {
+    const hasSession = !!(saved.projectId ?? saved.info ?? saved.memories?.length ?? saved.uploadedPhotos?.length)
+
+    if (hasSession) {
       dispatch({ type: 'HYDRATE', payload: saved })
+      return
     }
+
+    // sessionStorage empty — try to recover from DB
+    void (async () => {
+      try {
+        const res = await fetch('/api/projects/draft')
+        if (!res.ok) return
+        const json = await res.json() as { data?: { project: Record<string, unknown>; memories: Record<string, unknown>[] } | null }
+        const data = json.data
+        if (!data?.project) return
+
+        const p = data.project
+        dispatch({
+          type: 'HYDRATE',
+          payload: {
+            projectId: p['id'] as string,
+            info: {
+              title: (p['title'] as string) ?? '',
+              partner_name_1: (p['partner_name_1'] as string) ?? '',
+              partner_name_2: (p['partner_name_2'] as string) ?? '',
+              relationship_start_date: (p['relationship_start_date'] as string) ?? '',
+              ...(p['theme_id'] ? { theme_id: p['theme_id'] as string } : {}),
+            },
+            memories: (data.memories ?? []).map((m) => ({
+              id: m['id'] as string,
+              title: (m['title'] as string) ?? '',
+              short_description: m['short_description'] as string | undefined,
+              description: m['description'] as string | undefined,
+              occurred_at: m['occurred_at'] as string | undefined,
+              emoji: m['emoji'] as string | undefined,
+            })),
+          },
+        })
+
+        toast.info('Recuperamos seu rascunho anterior ✨', {
+          description: 'Continue de onde parou.',
+          duration: 5000,
+        })
+      } catch {
+        // Recovery failed silently — user starts fresh, no error shown
+      }
+    })()
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 

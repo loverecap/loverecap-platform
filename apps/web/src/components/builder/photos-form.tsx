@@ -78,7 +78,15 @@ export function PhotosForm() {
         body: file,
       })
 
-      if (!uploadRes.ok) throw new Error('Erro ao enviar. Tente novamente.')
+      if (!uploadRes.ok) {
+        // Clean up orphaned asset record
+        void fetch('/api/uploads/delete', {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ asset_id }),
+        })
+        throw new Error('Erro ao enviar. Tente novamente.')
+      }
 
       const previewUrl = URL.createObjectURL(file)
       // Use ADD_UPLOADED_PHOTO to atomically append — avoids stale closure when
@@ -97,7 +105,7 @@ export function PhotosForm() {
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files ?? []).slice(0, remaining)
-    files.forEach((file) => void uploadFile(file))
+    void Promise.allSettled(files.map((file) => uploadFile(file)))
     e.target.value = ''
   }
 

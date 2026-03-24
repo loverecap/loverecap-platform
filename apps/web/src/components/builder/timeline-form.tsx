@@ -311,7 +311,15 @@ export function TimelineForm() {
           body: fileBuffer,
         })
 
-        if (!uploadRes.ok) throw new Error('Erro ao enviar foto. Tente novamente.')
+        if (!uploadRes.ok) {
+          // Clean up orphaned asset so DB stays consistent
+          void fetch('/api/uploads/delete', {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ asset_id }),
+          })
+          throw new Error('Erro ao enviar foto. Tente novamente.')
+        }
 
         assetId = asset_id
         photoPreviewUrl = pendingPhoto.previewUrl

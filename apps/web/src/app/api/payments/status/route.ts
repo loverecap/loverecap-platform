@@ -10,84 +10,91 @@ import {
 } from '@loverecap/database'
 import { checkPixStatus } from '@/lib/payments/abacatepay'
 import { env } from '@/lib/env'
-import { ok, err, unauthorizedError, notFoundError, serverError } from '@/lib/api-response'
+import { ok, notFoundError } from '@/lib/api-response'
+import { AppError } from '@/lib/errors'
+import { withApiHandler } from '@/lib/with-api-handler'
 import { createLogger } from '@/lib/logger'
 import { sendStoryReadyEmail, sendAccountSetupEmail } from '@/lib/email'
 
-export async function GET(request: NextRequest) {
+export const GET = withApiHandler('payments/status', async (request: NextRequest) => {
   const log = createLogger('payments/status', request)
 
   const supabase = await createRouteHandlerClient()
   const user = await requireUser(supabase).catch(() => null)
-  if (!user) return unauthorizedError()
+  if (!user) throw AppError.unauthorized()
 
   const paymentId = request.nextUrl.searchParams.get('payment_id')
-  if (!paymentId) return err('payment_id é obrigatório', 400, 'VALIDATION_ERROR')
+  if (!paymentId) throw new AppError('VALIDATION_ERROR', 400, 'payment_id é obrigatório')
 
-  try {
-    const { data: payment, error: payErr } = await supabase
-      .from('payments')
-      .select('id, status, provider_payment_id, project_id, user_id, metadata')
-      .eq('id', paymentId)
-      .eq('user_id', user.id)
-      .single()
+  const { data: payment, error: payErr } = await supabase
+    .from('payments')
+    .select('id, status, provider_payment_id, project_id, user_id, metadata')
+    .eq('id', paymentId)
+    .eq('user_id', user.id)
+    .single()
 
-    if (payErr || !payment) return notFoundError('Payment')
+  if (payErr || !payment) return notFoundError('Payment')
 
-    if (payment.status === 'approved') {
-      const project = await getProjectById(supabase, payment.project_id).catch(() => null)
-      return ok({ status: 'PAID', slug: project?.slug })
-    }
+  if (payment.status === 'approved') {
+    const project = await getProjectById(supabase, payment.project_id).catch(() => null)
+    return ok({ status: 'PAID', slug: project?.slug ?? null })
+  }
 
-    if (!payment.provider_payment_id) {
-      return ok({ status: 'PENDING' })
-    }
+  if (!payment.provider_payment_id) {
+    return ok({ status: 'PENDING' })
+  }
 
-    const pixStatus = await checkPixStatus(env.abacatePayApiKey(), payment.provider_payment_id)
+  const pixStatus = await checkPixStatus(env.abacatePayApiKey(), payment.provider_payment_id)
 
-    if (pixStatus === 'PAID') {
-      const admin = createAdminClient()
+  if (pixStatus === 'PAID') {
+    const admin = createAdminClient()
 
-      await updatePaymentStatus(admin, payment.id, 'approved', payment.provider_payment_id)
-      log.info('Payment confirmed via polling', { paymentId: payment.id, projectId: payment.project_id })
+    await updatePaymentStatus(admin, payment.id, 'approved', payment.provider_payment_id)
+    log.info('Payment confirmed via polling', { paymentId: payment.id, projectId: payment.project_id })
 
-      const project = await getProjectById(admin, payment.project_id).catch(() => null)
-      const slug = project?.slug ?? ''
+    const project = await getProjectById(admin, payment.project_id).catch(() => null)
+    const slug = project?.slug ?? ''
 
+    let published = false
+    for (let attempt = 1; attempt <= 3; attempt++) {
       try {
         await publishProject(admin, payment.project_id, payment.user_id, slug)
-        log.info('Project auto-published', { projectId: payment.project_id, slug })
-
-        if (project) {
-          void sendPostPaymentEmail(admin, user, payment, project, slug).catch(
-            (emailErr) => log.error('Email dispatch failed', { error: String(emailErr) }),
-          )
-        }
+        log.info('Project auto-published', { projectId: payment.project_id, slug, attempt })
+        published = true
+        break
       } catch (publishError) {
-        log.error('Auto-publish failed after PIX confirmation', { projectId: payment.project_id, error: String(publishError) })
+        log.error('Auto-publish attempt failed', { projectId: payment.project_id, attempt, error: String(publishError) })
+        if (attempt < 3) await new Promise((r) => setTimeout(r, attempt * 1000))
       }
-
-      void logEvent(admin, 'payment.pix.confirmed', {
-        projectId: payment.project_id,
-        userId: payment.user_id,
-        payload: { provider_payment_id: payment.provider_payment_id },
-      })
-
-      return ok({ status: 'PAID', slug: slug || undefined })
     }
 
-    if (pixStatus === 'EXPIRED' || pixStatus === 'CANCELLED') {
-      await updatePaymentStatus(supabase, payment.id, 'cancelled')
-      log.info('Payment expired/cancelled', { paymentId: payment.id, pixStatus })
-      return ok({ status: 'EXPIRED' })
+    if (!published) {
+      return ok({ status: 'PROCESSING' })
     }
 
-    return ok({ status: 'PENDING' })
-  } catch (error) {
-    log.error('Unhandled error', { error: String(error) })
-    return serverError()
+    if (project) {
+      void sendPostPaymentEmail(admin, user, payment, project, slug).catch(
+        (emailErr) => log.error('Email dispatch failed', { error: String(emailErr) }),
+      )
+    }
+
+    void logEvent(admin, 'payment.pix.confirmed', {
+      projectId: payment.project_id,
+      userId: payment.user_id,
+      payload: { provider_payment_id: payment.provider_payment_id },
+    })
+
+    return ok({ status: 'PAID', slug: slug || null })
   }
-}
+
+  if (pixStatus === 'EXPIRED' || pixStatus === 'CANCELLED') {
+    await updatePaymentStatus(supabase, payment.id, 'cancelled')
+    log.info('Payment expired/cancelled', { paymentId: payment.id, pixStatus })
+    return ok({ status: 'EXPIRED' })
+  }
+
+  return ok({ status: 'PENDING' })
+})
 
 type AuthUser = NonNullable<Awaited<ReturnType<ReturnType<typeof createAdminClient>['auth']['getUser']>>['data']['user']>
 

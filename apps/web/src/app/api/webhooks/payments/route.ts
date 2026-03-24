@@ -121,18 +121,33 @@ async function handleBillingPaid(
   log.info('Payment approved', { paymentId: payment.id, projectId: payment.project_id })
 
   const project = await getProjectById(admin, payment.project_id).catch(() => null)
-  if (project) {
+  if (!project) {
+    log.error('billing.paid — project not found, cannot publish', { projectId: payment.project_id })
+    throw new Error(`Project ${payment.project_id} not found`)
+  }
+
+  let published = false
+  for (let attempt = 1; attempt <= 3; attempt++) {
     try {
       await publishProject(admin, project.id, payment.user_id, project.slug)
-      log.info('Project published', { projectId: project.id, slug: project.slug })
-
-      void sendPostPaymentEmail(admin, payment, project).catch(
-        (emailErr) => log.error('Email dispatch failed', { error: String(emailErr) }),
-      )
+      log.info('Project published', { projectId: project.id, slug: project.slug, attempt })
+      published = true
+      break
     } catch (publishError) {
-      log.error('Auto-publish failed', { projectId: project.id, error: String(publishError) })
+      log.error('Auto-publish attempt failed', { projectId: project.id, attempt, error: String(publishError) })
+      if (attempt < 3) await new Promise((r) => setTimeout(r, attempt * 1000))
     }
   }
+
+  if (!published) {
+    // Throwing here causes the outer catch to return HTTP 500,
+    // which signals AbacatePay to retry the webhook later.
+    throw new Error(`Failed to publish project ${project.id} after 3 attempts`)
+  }
+
+  void sendPostPaymentEmail(admin, payment, project).catch(
+    (emailErr) => log.error('Email dispatch failed', { error: String(emailErr) }),
+  )
 
   await logEvent(admin, 'payment.pix.confirmed', {
     projectId: payment.project_id,

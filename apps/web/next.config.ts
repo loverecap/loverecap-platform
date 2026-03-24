@@ -1,4 +1,5 @@
 import type { NextConfig } from 'next'
+import { withSentryConfig } from '@sentry/nextjs'
 
 const nextConfig: NextConfig = {
   typescript: {
@@ -19,24 +20,20 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https',
         hostname: '*.supabase.co',
-        // Covers both public paths and signed download URLs.
         pathname: '/storage/v1/object/**',
       },
     ],
-    // Prefer modern formats — Next.js negotiates with the browser automatically.
     formats: ['image/avif', 'image/webp'],
   },
   async headers() {
-    // CSP: allow YouTube iframes for the music player, Supabase for storage,
-    // and ytimg.com for YouTube thumbnails. Next.js requires 'unsafe-inline'
-    // and 'unsafe-eval' for its runtime scripts.
     const csp = [
       "default-src 'self'",
       "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: blob: *.supabase.co i.ytimg.com img.youtube.com",
       "media-src 'self' blob: *.supabase.co",
-      "connect-src 'self' *.supabase.co wss://*.supabase.co",
+      // /monitoring is the Sentry tunnel route (same-origin proxy to bypass ad-blockers)
+      "connect-src 'self' *.supabase.co wss://*.supabase.co *.sentry.io",
       "font-src 'self'",
       "frame-src https://www.youtube.com https://www.youtube-nocookie.com",
       "object-src 'none'",
@@ -47,20 +44,13 @@ const nextConfig: NextConfig = {
 
     return [
       {
-        // Apply baseline security headers to every route.
         source: '/(.*)',
         headers: [
-          // Content Security Policy — restricts resource origins
           { key: 'Content-Security-Policy', value: csp },
-          // Prevent MIME-type sniffing
           { key: 'X-Content-Type-Options', value: 'nosniff' },
-          // Disallow framing (clickjacking protection)
           { key: 'X-Frame-Options', value: 'DENY' },
-          // Legacy XSS filter — still respected by older browsers
           { key: 'X-XSS-Protection', value: '1; mode=block' },
-          // Limit referrer info sent to third parties
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
-          // Disable browser features we don't need
           { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
         ],
       },
@@ -68,4 +58,24 @@ const nextConfig: NextConfig = {
   },
 }
 
-export default nextConfig
+export default withSentryConfig(nextConfig, {
+  org: process.env['SENTRY_ORG'],
+  project: process.env['SENTRY_PROJECT'],
+
+  // Auth token for source map uploads — set in .env.sentry-build-plugin (gitignored)
+  authToken: process.env['SENTRY_AUTH_TOKEN'],
+
+  // Upload broader set of client files for better stack trace resolution
+  widenClientFileUpload: true,
+
+  // Proxy Sentry requests through /monitoring to bypass ad-blockers
+  tunnelRoute: '/monitoring',
+
+  // Suppress build output unless in CI
+  silent: !process.env.CI,
+
+  // Don't fail the build if Sentry upload fails
+  errorHandler(err) {
+    console.warn('[Sentry] Build upload warning:', err)
+  },
+})

@@ -162,12 +162,17 @@ export function PixPayment({ projectId, onSuccess }: PixPaymentProps) {
   }
 
   function startPolling(paymentId: string) {
+    let consecutiveErrors = 0
+
     pollingRef.current = setInterval(async () => {
       try {
         const res = await fetch(`/api/payments/status?payment_id=${paymentId}`)
+        if (!res.ok) throw new Error(`HTTP ${res.status}`)
+
         const json = await res.json() as {
-          data?: { status: string; slug?: string }
+          data?: { status: string; slug?: string | null }
         }
+        consecutiveErrors = 0
         const status = json.data?.status
 
         if (status === 'PAID') {
@@ -176,13 +181,22 @@ export function PixPayment({ projectId, onSuccess }: PixPaymentProps) {
           onSuccess?.()
           setTimeout(() => {
             const slug = json.data?.slug
-            router.push(`/checkout/success${slug ? `?slug=${slug}` : ''}`)
+            // slug=null means payment confirmed but publish is still processing
+            router.push(slug ? `/checkout/success?slug=${slug}` : '/dashboard?payment=confirmed')
           }, 2000)
+        } else if (status === 'PROCESSING') {
+          // Payment confirmed but project still being published — keep polling
         } else if (status === 'EXPIRED') {
           stopIntervals()
           setStep('expired')
         }
       } catch {
+        consecutiveErrors++
+        if (consecutiveErrors >= 5) {
+          stopIntervals()
+          setErrorMsg('Não conseguimos verificar seu pagamento. Atualize a página ou acesse seu dashboard.')
+          setStep('error')
+        }
       }
     }, 5000)
   }

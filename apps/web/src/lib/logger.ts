@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/nextjs'
 
 type Level = 'info' | 'warn' | 'error'
 
@@ -14,14 +15,8 @@ export function createLogger(
   const traceId = req.headers.get('x-request-id') ?? 'no-trace'
 
   function emit(level: Level, msg: string, data?: Record<string, unknown>): void {
-    const line = JSON.stringify({
-      level,
-      ts: new Date().toISOString(),
-      traceId,
-      service,
-      msg,
-      ...data,
-    })
+    const payload = { level, ts: new Date().toISOString(), traceId, service, msg, ...data }
+    const line = JSON.stringify(payload)
 
     if (level === 'error') console.error(line)
     else if (level === 'warn') console.warn(line)
@@ -29,8 +24,18 @@ export function createLogger(
   }
 
   return {
-    info: (msg, data) => emit('info', msg, data),
-    warn: (msg, data) => emit('warn', msg, data),
-    error: (msg, data) => emit('error', msg, data),
+    info(msg, data) {
+      emit('info', msg, data)
+      Sentry.logger.info(msg, { traceId, service, ...data })
+    },
+    warn(msg, data) {
+      emit('warn', msg, data)
+      Sentry.logger.warn(msg, { traceId, service, ...data })
+    },
+    error(msg, data) {
+      emit('error', msg, data)
+      // Sends to Sentry Logs (searchable, correlated to traces)
+      Sentry.logger.error(msg, { traceId, service, ...data })
+    },
   }
 }

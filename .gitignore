@@ -45,3 +45,5 @@ CLAUDE.md
 
 #Docs
 docs
+# Sentry Config File
+.env.sentry-build-plugin

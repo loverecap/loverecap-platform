@@ -21,4 +21,9 @@ export const env = {
   abacatePayWebhookSecret: () => process.env['ABACATEPAY_WEBHOOK_SECRET'],
 
   resendApiKey: () => process.env['RESEND_API_KEY'],
+
+  // Optional — Sentry error tracking. Silent if not configured.
+  // NEXT_PUBLIC_SENTRY_DSN → browser/client bundle
+  // SENTRY_DSN            → server + edge runtimes
+  sentryDsn: () => process.env['SENTRY_DSN'],
 } as const
