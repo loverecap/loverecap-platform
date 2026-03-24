@@ -16,7 +16,7 @@ export interface CreatePixParams {
     
     taxId: string
   }
-  metadata?: Record<string, string>
+  metadata?: Record<string, string | undefined>
 }
 
 export interface PixCharge {
@@ -44,7 +44,9 @@ export async function createPixCharge(
       expiresIn: params.expiresIn ?? 3600,
       description: params.description,
       customer: params.customer,
-      metadata: params.metadata ?? {},
+      ...(params.metadata && Object.keys(params.metadata).length > 0
+        ? { metadata: params.metadata }
+        : {}),
     }),
   })
 

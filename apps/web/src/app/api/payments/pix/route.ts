@@ -66,7 +66,8 @@ export const POST = withApiHandler('payments/pix', async (request: NextRequest) 
       cellphone,
       taxId: tax_id,
     },
-    metadata: { project_id, user_id: user.id },
+    // Não passamos metadata pro AbacatePay — o provedor serializa como key:value
+    // e rejeita o ":" gerado. Rastreamos internamente via payment.project_id / payment.user_id.
   })
 
   log.info('PIX charge created', { chargeId: charge.id, projectId: project_id })
