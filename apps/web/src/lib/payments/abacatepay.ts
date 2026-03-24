@@ -4,19 +4,17 @@ const BASE_URL = 'https://api.abacatepay.com'
 export type PixStatus = 'PENDING' | 'PAID' | 'EXPIRED' | 'CANCELLED'
 
 export interface CreatePixParams {
-  
   amount: number
-  
   expiresIn?: number
   description: string
+  /** Safe identifier with no colons — use UUID or alphanumeric only */
+  customId?: string
   customer: {
     name: string
     email: string
     cellphone: string
-    
     taxId: string
   }
-  metadata?: Record<string, string | undefined>
 }
 
 export interface PixCharge {
@@ -43,10 +41,8 @@ export async function createPixCharge(
       amount: params.amount,
       expiresIn: params.expiresIn ?? 3600,
       description: params.description,
+      ...(params.customId ? { customId: params.customId } : {}),
       customer: params.customer,
-      ...(params.metadata && Object.keys(params.metadata).length > 0
-        ? { metadata: params.metadata }
-        : {}),
     }),
   })
 

@@ -59,15 +59,14 @@ export const POST = withApiHandler('payments/pix', async (request: NextRequest) 
 
   const charge = await createPixCharge(env.abacatePayApiKey(), {
     amount: PRICE_CENTS,
-    description: 'LoveRecap — acesso vitalício',
+    description: 'LoveRecap acesso vitalicio',
+    customId: project_id, // UUID — only hyphens, no colons
     customer: {
       name: (user.user_metadata?.['full_name'] as string | undefined) ?? email,
       email,
       cellphone,
       taxId: tax_id,
     },
-    // Não passamos metadata pro AbacatePay — o provedor serializa como key:value
-    // e rejeita o ":" gerado. Rastreamos internamente via payment.project_id / payment.user_id.
   })
 
   log.info('PIX charge created', { chargeId: charge.id, projectId: project_id })
