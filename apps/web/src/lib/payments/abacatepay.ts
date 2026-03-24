@@ -12,7 +12,6 @@ export interface CreatePixParams {
     cellphone: string
     taxId: string
   }
-  metadata?: Record<string, string>
 }
 
 export interface PixCharge {
@@ -27,30 +26,29 @@ export async function createPixCharge(
   apiKey: string,
   params: CreatePixParams,
 ): Promise<PixCharge> {
-  const res = await fetch(`${BASE_URL}/transparents/create`, {
+  const body = {
+    amount: params.amount,
+    expiresIn: params.expiresIn ?? 3600,
+    description: params.description,
+    customer: params.customer,
+  }
+
+  const res = await fetch(`${BASE_URL}/v1/pixQrCode/create`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${apiKey}`,
     },
-    body: JSON.stringify({
-      method: 'PIX',
-      data: {
-        amount: params.amount,
-        expiresIn: params.expiresIn ?? 3600,
-        description: params.description,
-        customer: params.customer,
-        ...(params.metadata ? { metadata: params.metadata } : {}),
-      },
-    }),
+    body: JSON.stringify(body),
   })
 
+  const rawText = await res.text()
+
   if (!res.ok) {
-    const text = await res.text().catch(() => '')
-    throw new Error(`AbacatePay error ${res.status}: ${text}`)
+    throw new Error(`AbacatePay error ${res.status}: ${rawText}`)
   }
 
-  const json = await res.json() as { data: PixCharge }
+  const json = JSON.parse(rawText) as { data: PixCharge }
   return json.data
 }
 
@@ -58,7 +56,7 @@ export async function checkPixStatus(
   apiKey: string,
   pixId: string,
 ): Promise<PixStatus> {
-  const url = new URL(`${BASE_URL}/transparents/check`)
+  const url = new URL(`${BASE_URL}/v1/pixQrCode/check`)
   url.searchParams.set('id', pixId)
 
   const res = await fetch(url.toString(), {
