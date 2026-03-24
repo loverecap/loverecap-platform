@@ -59,8 +59,7 @@ export const POST = withApiHandler('payments/pix', async (request: NextRequest) 
 
   const charge = await createPixCharge(env.abacatePayApiKey(), {
     amount: PRICE_CENTS,
-    description: 'LoveRecap acesso vitalicio',
-    customId: project_id, // UUID — only hyphens, no colons
+    description: 'LoveRecap - acesso vitalicio',
     customer: {
       name: (user.user_metadata?.['full_name'] as string | undefined) ?? email,
       email,
