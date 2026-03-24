@@ -27,7 +27,7 @@ export async function createPixCharge(
   apiKey: string,
   params: CreatePixParams,
 ): Promise<PixCharge> {
-  const res = await fetch(`${BASE_URL}/v2/transparents/create`, {
+  const res = await fetch(`${BASE_URL}/transparents/create`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -58,7 +58,7 @@ export async function checkPixStatus(
   apiKey: string,
   pixId: string,
 ): Promise<PixStatus> {
-  const url = new URL(`${BASE_URL}/v2/transparents/check`)
+  const url = new URL(`${BASE_URL}/transparents/check`)
   url.searchParams.set('id', pixId)
 
   const res = await fetch(url.toString(), {
