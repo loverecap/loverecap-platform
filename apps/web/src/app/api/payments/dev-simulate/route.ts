@@ -2,11 +2,16 @@ import { type NextRequest } from 'next/server'
 import { z } from 'zod'
 import { createRouteHandlerClient } from '@/lib/supabase/server'
 import { requireUser } from '@/lib/auth'
-import { env } from '@/lib/env'
+import {
+  createAdminClient,
+  getProjectById,
+  updatePaymentStatus,
+  publishProject,
+} from '@loverecap/database'
 import { ok, err, unauthorizedError, serverError } from '@/lib/api-response'
 
 const schema = z.object({
-  provider_payment_id: z.string().min(1),
+  payment_id: z.string().uuid(),
 })
 
 export async function POST(request: NextRequest) {
@@ -25,28 +30,32 @@ export async function POST(request: NextRequest) {
   try {
     const body: unknown = await request.json()
     const parsed = schema.safeParse(body)
-    if (!parsed.success) return err('provider_payment_id é obrigatório', 400, 'VALIDATION_ERROR')
+    if (!parsed.success) return err('payment_id é obrigatório', 400, 'VALIDATION_ERROR')
 
-    const { provider_payment_id } = parsed.data
+    const { payment_id } = parsed.data
 
-    const url = new URL('https://api.abacatepay.com/v1/pixQrCode/simulate-payment')
-    url.searchParams.set('id', provider_payment_id)
+    // Verify the payment belongs to the current user
+    const { data: payment } = await supabase
+      .from('payments')
+      .select('id, project_id, user_id, provider_payment_id, status')
+      .eq('id', payment_id)
+      .eq('user_id', user.id)
+      .single()
 
-    const res = await fetch(url.toString(), {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${env.abacatePayApiKey()}`,
-      },
-      body: JSON.stringify({}),
-    })
+    if (!payment) return err('Payment not found', 404, 'NOT_FOUND')
+    if (payment.status === 'approved') return ok({ simulated: true, already: true })
 
-    if (!res.ok) {
-      const text = await res.text().catch(() => '')
-      throw new Error(`AbacatePay simulate error ${res.status}: ${text}`)
-    }
+    const admin = createAdminClient()
 
-    return ok({ simulated: true })
+    // Mark payment as approved directly — bypasses AbacatePay entirely
+    await updatePaymentStatus(admin, payment.id, 'approved', payment.provider_payment_id ?? 'dev-simulated')
+
+    const project = await getProjectById(admin, payment.project_id).catch(() => null)
+    const slug = project?.slug ?? ''
+
+    await publishProject(admin, payment.project_id, payment.user_id, slug)
+
+    return ok({ simulated: true, slug })
   } catch (error) {
     console.error('[POST /api/payments/dev-simulate]', error)
     return serverError()

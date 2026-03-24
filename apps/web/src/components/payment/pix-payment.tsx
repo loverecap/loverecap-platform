@@ -229,7 +229,7 @@ export function PixPayment({ projectId, onSuccess }: PixPaymentProps) {
     await fetch('/api/payments/dev-simulate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ provider_payment_id: pixData.providerPaymentId }),
+      body: JSON.stringify({ payment_id: pixData.paymentId }),
     })
   }
 
