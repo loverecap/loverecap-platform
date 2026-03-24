@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
 
     const { provider_payment_id } = parsed.data
 
-    const url = new URL('https://api.abacatepay.com/v1/pixQrCode/simulate-payment')
+    const url = new URL('https://api.abacatepay.com/transparents/simulate-payment')
     url.searchParams.set('id', provider_payment_id)
 
     const res = await fetch(url.toString(), {

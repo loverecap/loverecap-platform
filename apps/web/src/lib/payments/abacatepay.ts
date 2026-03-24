@@ -50,8 +50,8 @@ export async function createPixCharge(
     throw new Error(`AbacatePay error ${res.status}: ${text}`)
   }
 
-  const json = await res.json() as PixCharge
-  return json
+  const json = await res.json() as { data: PixCharge }
+  return json.data
 }
 
 export async function checkPixStatus(
