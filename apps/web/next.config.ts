@@ -33,7 +33,7 @@ const nextConfig: NextConfig = {
       "img-src 'self' data: blob: *.supabase.co i.ytimg.com img.youtube.com",
       "media-src 'self' blob: *.supabase.co",
       // /monitoring is the Sentry tunnel route (same-origin proxy to bypass ad-blockers)
-      "connect-src 'self' *.supabase.co wss://*.supabase.co *.sentry.io",
+      "connect-src 'self' *.supabase.co wss://*.supabase.co *.sentry.io *.ingest.sentry.io *.ingest.us.sentry.io",
       "font-src 'self'",
       "frame-src https://www.youtube.com https://www.youtube-nocookie.com",
       "object-src 'none'",
