@@ -18,7 +18,7 @@ const schema = z.object({
   cellphone: z.string().min(10).max(20),
 })
 
-const PRICE_CENTS = 999
+const PRICE_CENTS = 100 // TODO: revert to 999 after production test
 
 export const POST = withApiHandler('payments/pix', async (request: NextRequest) => {
   const log = createLogger('payments/pix', request)
